@@ -7,17 +7,20 @@ using UnityEngine.UI;
 public class PlayerInputProvider : MonoBehaviour
 {
     [Range(0f, 15f)]
-    [SerializeField] private float minInputVelocity, maxInputVelocity;
+    public float minInputVelocity, maxInputVelocity;
     [SerializeField] private float maxTimeFrame = 2f;
 
     [Header("UI")]
     [SerializeField] private Slider slider;
 
-    public UnityEvent<float> onInputReady;
+    public UnityEvent onInputStarted;
+    public UnityEvent<float> onInputPerformed;
 
     private float _inputValue;
     private float _timeElapsed;
     private bool _pressed;
+
+    public float CurrentValue => _inputValue;
 
     private void Awake()
     {
@@ -36,8 +39,6 @@ public class PlayerInputProvider : MonoBehaviour
         {
             _pressed = false;
         }
-
-        slider.value = _inputValue;
     }
 
 
@@ -45,6 +46,7 @@ public class PlayerInputProvider : MonoBehaviour
     {
         _timeElapsed = 0f;
         _inputValue = minInputVelocity;
+        onInputStarted.Invoke();
         while (_pressed && _timeElapsed <= maxTimeFrame)
         {
             var speed = (maxInputVelocity - minInputVelocity) / maxTimeFrame;
@@ -60,12 +62,13 @@ public class PlayerInputProvider : MonoBehaviour
 
     private void SendInput()
     {
-        onInputReady.Invoke(_inputValue);
+        onInputPerformed.Invoke(_inputValue);
         _pressed = false;
     }
 
     private void OnDestroy()
     {
-        onInputReady.RemoveAllListeners();
+        onInputPerformed.RemoveAllListeners();
+        onInputStarted.RemoveAllListeners();
     }
 }

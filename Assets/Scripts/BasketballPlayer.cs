@@ -28,6 +28,9 @@ public class BasketballPlayer : MonoBehaviour
     private float _gravityMagnitude;
     private Pose _defaultPose;
     private MultiInterpolator<Vector3> _interpolator;
+    private Vector3 _perfectShotOptimalVelocity, _backboardShotOptimalVelocity;
+    public Vector3 PerfectShotOptimalVelocity => _perfectShotOptimalVelocity;
+    public Vector3 BackboardShotOptimalVelocity => _backboardShotOptimalVelocity;
 
     private void Awake()
     {
@@ -70,13 +73,31 @@ public class BasketballPlayer : MonoBehaviour
         {
             ResetBall();
         }
+
+        UpdateShotOptimalVelocities();
     }
 
-    public void ComputeBallShot(float inputVelocity)
+    public void OnInputReceived(float inputVelocity)
     {
         if (debug)
             Time.timeScale = timeDilationFactor;
 
+        _interpolator.SetPairs(new List<KeyValuePair<float, Vector3>>
+        {
+            new(0f, Vector3.zero),
+            new(_perfectShotOptimalVelocity.sqrMagnitude, _perfectShotOptimalVelocity),
+            new(_backboardShotOptimalVelocity.sqrMagnitude, _backboardShotOptimalVelocity),
+            new(15f*15f, 15f*_backboardShotOptimalVelocity.normalized),
+        });
+
+        var velocity = _interpolator.Evaluate(inputVelocity * inputVelocity);
+        Debug.Log($"[{GetType().Name}] Perfect Shot opt. = {_perfectShotOptimalVelocity.magnitude}, Backboard Shot opt. = {_backboardShotOptimalVelocity.magnitude}\n Velocity = {velocity.magnitude}");
+
+        ShootBall(velocity);
+    }
+
+    private void UpdateShotOptimalVelocities()
+    {
         var start = ballRigidbody.transform.position;
 
         var backboardShotTarget = court.GetHoopTarget(transform.position, ShotType.Backboard);
@@ -86,25 +107,12 @@ public class BasketballPlayer : MonoBehaviour
         var deltaToGroundAngle = Vector3.Angle(Vector3.ProjectOnPlane(deltaPosition, Vector3.up), deltaPosition);
 
         TryGetPerfectVelocity(start, perfectShotTarget,
-            Mathf.Clamp(deltaToGroundAngle + perfectShotAngleCorrection, 0, 90), 
-            out var perfectShotOptimalVelocity);
+            Mathf.Clamp(deltaToGroundAngle + perfectShotAngleCorrection, 0, 90),
+            out _perfectShotOptimalVelocity);
 
         TryGetPerfectVelocity(start, backboardShotTarget,
             Mathf.Clamp(deltaToGroundAngle + backboardShotAngleCorrection, 0, 90),
-            out var backboardShotOptimalVelocity);
-
-        _interpolator.SetPairs(new List<KeyValuePair<float, Vector3>>
-        {
-            new(0f, Vector3.zero),
-            new(perfectShotOptimalVelocity.sqrMagnitude, perfectShotOptimalVelocity),
-            new(backboardShotOptimalVelocity.sqrMagnitude, backboardShotOptimalVelocity),
-            new(15f*15f, 15f*backboardShotOptimalVelocity.normalized),
-        });
-
-        var velocity = _interpolator.Evaluate(inputVelocity * inputVelocity);
-        Debug.Log($"[{GetType().Name}] Perfect Shot opt. = {perfectShotOptimalVelocity.magnitude}, Backboard Shot opt. = {backboardShotOptimalVelocity.magnitude}\n Velocity = {velocity.magnitude}");
-
-        ShootBall(velocity);
+            out _backboardShotOptimalVelocity);
     }
 
     private void ShootBall(Vector3 initialVelocity)
