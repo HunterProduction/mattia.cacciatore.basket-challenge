@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum ShotType
@@ -19,12 +20,14 @@ public class BasketballPlayer : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool debug = false;
     [SerializeField] private ShotType previewShotType = ShotType.Perfect;
+    [Range(0f, 15f)]
+    [SerializeField] private float testVelocity = 8f;
     [Range(0.1f, 1f)]
     [SerializeField] private float timeDilationFactor = 1f;
-
     
     private float _gravityMagnitude;
     private Pose _defaultPose;
+    private MultiInterpolator<Vector3> _interpolator;
 
     private void Awake()
     {
@@ -52,24 +55,24 @@ public class BasketballPlayer : MonoBehaviour
         _defaultPose.rotation = ballRigidbody.transform.localRotation;
 
         // Caching gravity magnitude to spare square root computing
-        _gravityMagnitude = Physics.gravity.magnitude;        
+        _gravityMagnitude = Physics.gravity.magnitude;       
+        
+        _interpolator = new MultiInterpolator<Vector3>(new List<KeyValuePair<float, Vector3>> 
+        {
+            new(0f, Vector3.zero),
+            new(15*15, Vector3.zero),
+        }, Vector3.Lerp);
     }
 
     private void Update()
     {
-        // Debug only
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ComputeBallShot();
-        }
-
         if (Input.GetKeyDown(KeyCode.R))
         {
             ResetBall();
         }
     }
 
-    private void ComputeBallShot()
+    public void ComputeBallShot(float inputVelocity)
     {
         if (debug)
             Time.timeScale = timeDilationFactor;
@@ -90,10 +93,18 @@ public class BasketballPlayer : MonoBehaviour
             Mathf.Clamp(deltaToGroundAngle + backboardShotAngleCorrection, 0, 90),
             out var backboardShotOptimalVelocity);
 
-        Debug.Log($"[{GetType().Name}] Perfect Shot opt. = {perfectShotOptimalVelocity.magnitude}, Backboard Shot opt. = {backboardShotOptimalVelocity.magnitude}");
-        // #TODO: Implement input velocity. Should be mapped in range of around 0 to 15.
+        _interpolator.SetPairs(new List<KeyValuePair<float, Vector3>>
+        {
+            new(0f, Vector3.zero),
+            new(perfectShotOptimalVelocity.sqrMagnitude, perfectShotOptimalVelocity),
+            new(backboardShotOptimalVelocity.sqrMagnitude, backboardShotOptimalVelocity),
+            new(15f*15f, 15f*backboardShotOptimalVelocity.normalized),
+        });
 
-        ShootBall(backboardShotOptimalVelocity);
+        var velocity = _interpolator.Evaluate(inputVelocity * inputVelocity);
+        Debug.Log($"[{GetType().Name}] Perfect Shot opt. = {perfectShotOptimalVelocity.magnitude}, Backboard Shot opt. = {backboardShotOptimalVelocity.magnitude}\n Velocity = {velocity.magnitude}");
+
+        ShootBall(velocity);
     }
 
     private void ShootBall(Vector3 initialVelocity)
