@@ -15,32 +15,48 @@ public class BasketballPlayer : MonoBehaviour
     [SerializeField] private PlayerInputProvider inputProvider;
 
     [Header("Parameters")]
-    [SerializeField] private float perfectShotAngleCorrection = 45f;
-    [SerializeField] private float backboardShotAngleCorrection = 20f;
+    [Range(-90f, 0f)]
+    [SerializeField] private float perfectShotTangentAngle = -55f;
+    [Range(-90f, 0f)]
+    [SerializeField] private float backboardShotTangentAngle = -20f;
+    [Range(.5f, 1f)]
+    [SerializeField] private float minShotFactor = .9f;
+    [Range(1f, 1.2f)]
+    [SerializeField] private float maxShotFactor = 1.05f;
 
     [Header("Debug")]
     [SerializeField] private bool debug = false;
     [SerializeField] private ShotType previewShotType = ShotType.Perfect;
-    [Range(0f, 15f)]
-    [SerializeField] private float testVelocity = 8f;
     [Range(0.1f, 1f)]
     [SerializeField] private float timeDilationFactor = 1f;
-    
+
+    private Vector3 _perfectShotOptimalVelocity;
+    public Vector3 PerfectShotOptimalVelocity => _perfectShotOptimalVelocity;
+
+    private Vector3 _backboardShotOptimalVelocity;
+    public Vector3 BackboardShotOptimalVelocity => _backboardShotOptimalVelocity;
+
+    private Vector3 _minShotVelocity;
+    public Vector3 MinShotVelocity => _minShotVelocity;
+
+    private Vector3 _maxShotVelocity;
+    public Vector3 MaxShotVelocity => _maxShotVelocity;
+
+
+    private bool _computeVelocities = true;
     private float _gravityMagnitude;
     private Pose _defaultPose;
     private MultiInterpolator<Vector3> _interpolator;
-    private Vector3 _perfectShotOptimalVelocity, _backboardShotOptimalVelocity;
-    public Vector3 PerfectShotOptimalVelocity => _perfectShotOptimalVelocity;
-    public Vector3 BackboardShotOptimalVelocity => _backboardShotOptimalVelocity;
 
     private void Awake()
     {
-        if(ballRigidbody == null)
+        // #TODO: Find a smarter way to generalize this repeated check pattern.
+        if (ballRigidbody == null)
         {
             ballRigidbody = GetComponentInChildren<Rigidbody>();
             if(ballRigidbody == null)
             {
-                throw new UnassignedReferenceException("Unable to retrieve ballRigidbody reference");
+                throw new UnassignedReferenceException("Unable to retrieve reference");
             }
         }
 
@@ -49,14 +65,14 @@ public class BasketballPlayer : MonoBehaviour
             court = FindObjectOfType<BasketballCourt>();
             if(court == null)
             {
-                throw new UnassignedReferenceException("Unable to retrieve court reference");
+                throw new UnassignedReferenceException("Unable to retrieve reference");
             }
         }
 
-        ballRigidbody.isKinematic = true;
-
         _defaultPose.position = ballRigidbody.transform.localPosition;
         _defaultPose.rotation = ballRigidbody.transform.localRotation;
+
+        ResetBall();
 
         // Caching gravity magnitude to spare square root computing
         _gravityMagnitude = Physics.gravity.magnitude;       
@@ -64,7 +80,7 @@ public class BasketballPlayer : MonoBehaviour
         _interpolator = new MultiInterpolator<Vector3>(new List<KeyValuePair<float, Vector3>> 
         {
             new(0f, Vector3.zero),
-            new(15*15, Vector3.zero),
+            new(1f, Vector3.zero),
         }, Vector3.Lerp);
     }
 
@@ -80,27 +96,29 @@ public class BasketballPlayer : MonoBehaviour
 
     private void Update()
     {
+        if(_computeVelocities)
+        {
+            UpdateShotOptimalVelocities();
+        }
+
+        // Debug
         if (Input.GetKeyDown(KeyCode.R))
         {
             ResetBall();
         }
-
-        UpdateShotOptimalVelocities();
     }
 
     public void OnInputReceived(float inputVelocity)
     {
-        inputVelocity = testVelocity;
-
         if (debug)
             Time.timeScale = timeDilationFactor;
 
         _interpolator.SetPairs(new List<KeyValuePair<float, Vector3>>
         {
-            new(inputProvider.minInputVelocity*inputProvider.minInputVelocity, inputProvider.minInputVelocity*_perfectShotOptimalVelocity.normalized),
+            new(_minShotVelocity.sqrMagnitude, _minShotVelocity),
             new(_perfectShotOptimalVelocity.sqrMagnitude, _perfectShotOptimalVelocity),
             new(_backboardShotOptimalVelocity.sqrMagnitude, _backboardShotOptimalVelocity),
-            new(inputProvider.maxInputVelocity*inputProvider.maxInputVelocity, inputProvider.maxInputVelocity*_backboardShotOptimalVelocity.normalized),
+            new(_maxShotVelocity.sqrMagnitude, _maxShotVelocity),
         });
 
         var velocity = _interpolator.Evaluate(inputVelocity * inputVelocity);
@@ -109,48 +127,10 @@ public class BasketballPlayer : MonoBehaviour
         ShootBall(velocity);
     }
 
-    private void UpdateShotOptimalVelocities()
-    {
-        var start = ballRigidbody.transform.position;
-
-        var backboardShotTarget = court.GetHoopTarget(transform.position, ShotType.Backboard);
-        var perfectShotTarget = court.GetHoopTarget(transform.position, ShotType.Perfect);
-
-        var deltaPosition = perfectShotTarget - start;
-        var deltaToGroundAngle = Vector3.Angle(Vector3.ProjectOnPlane(deltaPosition, Vector3.up), deltaPosition);
-
-        TryGetPerfectVelocity(start, perfectShotTarget,
-            Mathf.Clamp(perfectShotAngleCorrection, 0, 90),
-            out _perfectShotOptimalVelocity);
-
-        TryGetPerfectVelocity(start, backboardShotTarget,
-            Mathf.Clamp(backboardShotAngleCorrection, 0, 90),
-            out _backboardShotOptimalVelocity);
-
-        /*
-        TryGetPerfectVelocity(start, perfectShotTarget,
-            Mathf.Clamp(deltaToGroundAngle + perfectShotAngleCorrection, 0, 90),
-            out _perfectShotOptimalVelocity);
-
-        TryGetPerfectVelocity(start, backboardShotTarget,
-            Mathf.Clamp(deltaToGroundAngle + backboardShotAngleCorrection, 0, 90),
-            out _backboardShotOptimalVelocity);
-        */
-        /*
-        var perfectShotOptimalVelocityMagnitude = _perfectShotOptimalVelocity.magnitude;
-
-        _perfectShotOptimalVelocity = Mathf.Clamp(perfectShotOptimalVelocityMagnitude, 
-            inputProvider.minInputVelocity,
-            inputProvider.maxInputVelocity) *_perfectShotOptimalVelocity.normalized;
-
-        _backboardShotOptimalVelocity = Mathf.Clamp(perfectShotOptimalVelocityMagnitude + 1f,
-            inputProvider.minInputVelocity,
-            inputProvider.maxInputVelocity) * _backboardShotOptimalVelocity.normalized;
-        */
-    }
-
     private void ShootBall(Vector3 initialVelocity)
     {
+        _computeVelocities = false;
+
         ballRigidbody.transform.parent = null;
         ballRigidbody.isKinematic = false;
         ballRigidbody.AddForce(initialVelocity, ForceMode.VelocityChange);
@@ -166,81 +146,67 @@ public class BasketballPlayer : MonoBehaviour
         var ballTransform = ballRigidbody.transform;
         ballTransform.parent = transform;
         ballTransform.SetLocalPositionAndRotation(_defaultPose.position, _defaultPose.rotation);
+
+        _computeVelocities = true;
     }
-    
-    // Tangent impact version
-    private bool TryGetPerfectVelocity(Vector3 start, Vector3 target, float impactAngleDeg, out Vector3 initialVelocity)
+
+    private void UpdateShotOptimalVelocities()
+    {
+        var start = ballRigidbody.transform.position;
+
+        var backboardShotTarget = court.GetHoopTarget(transform.position, ShotType.Backboard);
+        var perfectShotTarget = court.GetHoopTarget(transform.position, ShotType.Perfect);
+
+        TryGetPerfectVelocity(start, perfectShotTarget,
+            perfectShotTangentAngle,
+            out _perfectShotOptimalVelocity);
+
+        TryGetPerfectVelocity(start, backboardShotTarget,
+            backboardShotTangentAngle,
+            out _backboardShotOptimalVelocity);
+
+        _minShotVelocity = (_perfectShotOptimalVelocity.magnitude * minShotFactor) * _perfectShotOptimalVelocity.normalized;
+        _maxShotVelocity = (_backboardShotOptimalVelocity.magnitude * maxShotFactor) * _backboardShotOptimalVelocity.normalized;
+    }
+
+    private bool TryGetPerfectVelocity(Vector3 start, Vector3 target, float targetTangentAngle, out Vector3 initialVelocity)
     {
         initialVelocity = Vector3.zero;
 
         Vector3 toTarget = target - start;
-        Vector3 toTargetXZ = new Vector3(toTarget.x, 0f, toTarget.z);
-        float deltaX = toTargetXZ.magnitude;
-        float deltaY = toTarget.y;
-
-        float impactRad = impactAngleDeg * Mathf.Deg2Rad;
-        float tanImpact = Mathf.Tan(impactRad);
-
-        float denom = deltaY - deltaX * tanImpact;
-        if (denom <= 0f)
-        {
-            // No valid solution
-            return false;
-        }
-
-        // Horizontal speed
-        float vx = Mathf.Sqrt((Physics.gravity.magnitude * deltaX * deltaX) / (2f * denom));
-
-        // Flight time
-        float T = deltaX / vx;
-
-        // Vertical speed at launch
-        float vy = vx * tanImpact + Physics.gravity.magnitude * T;
-
-        // Direction in XZ plane
-        Vector3 dirXZ = toTargetXZ.normalized;
-
-        // Final velocity vector
-        initialVelocity = dirXZ * vx + Vector3.up * vy;
-
-        return true;
-    }
-    
-
-    /*
-    private bool TryGetPerfectVelocity(Vector3 start,  Vector3 target, float angleDeg, out Vector3 initialVelocity)
-    {
-        initialVelocity = Vector3.zero;
-        Vector3 toTarget = target - start;
-
-        // Horizontal displacement (XZ-plane)
         Vector3 toTargetXZ = new Vector3(toTarget.x, 0f, toTarget.z);
         float distanceXZ = toTargetXZ.magnitude;
         float deltaY = toTarget.y;
 
-        float angleRad = angleDeg * Mathf.Deg2Rad;
-        float cosAngle = Mathf.Cos(angleRad);
-        float tanAngle = Mathf.Tan(angleRad);
-
-        // Check for valid geometry
-        float denom = 2f * cosAngle * cosAngle * (distanceXZ * tanAngle - deltaY);
-        if (denom <= 0f)
-        {
-            //Debug.LogWarning($"[{GetType().Name}]No valid shot solution for given parameters.");
+        if (Mathf.Approximately(distanceXZ, 0))
             return false;
-        }
 
-        // Compute required launch speed magnitude
-        float speed = Mathf.Sqrt((_gravityMagnitude * distanceXZ * distanceXZ) / denom);
+        float targetTangentAngleRad = targetTangentAngle * Mathf.Deg2Rad;
+        float tanImpact = Mathf.Tan(targetTangentAngleRad);
 
-        // Construct velocity direction in XZ-plane
+        // Compute required launch angle
+        float tanLaunch = (2f * deltaY / distanceXZ) - tanImpact;
+        float launchAngleRad = Mathf.Atan(tanLaunch);
+
+        float cosLaunch = Mathf.Cos(launchAngleRad);
+        float tanLaunchVal = Mathf.Tan(launchAngleRad);
+
+        // Denominator of speed formula
+        float denom = cosLaunch * cosLaunch * (tanLaunchVal - tanImpact);
+        if (denom <= 0f)
+            return false; // no real solution (geometry impossible)
+
+        // Compute required speed magnitude
+        float speed = Mathf.Sqrt((_gravityMagnitude * distanceXZ) / denom);
+
+        // Direction in XZ plane
         Vector3 dirXZ = toTargetXZ.normalized;
 
-        // Final velocity vector
-        initialVelocity = dirXZ * speed * cosAngle + Vector3.up * speed * Mathf.Sin(angleRad);
+        // Final 3D velocity vector
+        initialVelocity = dirXZ * speed * cosLaunch + Vector3.up * speed * Mathf.Sin(launchAngleRad);
         return true;
     }
-    */
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -258,8 +224,8 @@ public class BasketballPlayer : MonoBehaviour
 
         Gizmos.color = Color.red;
         var delta = target - ballRigidbody.position;
-        var angleCorrection = previewShotType == ShotType.Perfect ? perfectShotAngleCorrection : backboardShotAngleCorrection;
-        Gizmos.DrawLine(ballRigidbody.position, ballRigidbody.position + Quaternion.AngleAxis(angleCorrection, Vector3.Cross(delta, Vector3.up)) * delta.normalized);
+        var angleCorrection = previewShotType == ShotType.Perfect ? perfectShotTangentAngle : backboardShotTangentAngle;
+        Gizmos.DrawLine(target, target + Quaternion.AngleAxis(angleCorrection, Vector3.Cross(delta, Vector3.up)) * ballRigidbody.transform.forward);
     }
 #endif
 }

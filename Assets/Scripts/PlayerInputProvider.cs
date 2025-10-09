@@ -6,13 +6,10 @@ using UnityEngine.UI;
 // #TODO: Rethink class naming and architecture.
 public class PlayerInputProvider : MonoBehaviour
 {
-    [Range(0f, 15f)]
-    public float minInputVelocity, maxInputVelocity;
+    [SerializeField] private BasketballPlayer player;
     [SerializeField] private float maxTimeFrame = 2f;
 
-    [Header("UI")]
-    [SerializeField] private Slider slider;
-
+    [Header("Events")]
     public UnityEvent onInputStarted;
     public UnityEvent<float> onInputPerformed;
 
@@ -20,13 +17,7 @@ public class PlayerInputProvider : MonoBehaviour
     private float _timeElapsed;
     private bool _pressed;
 
-    public float CurrentValue => _inputValue;
-
-    private void Awake()
-    {
-        slider.minValue = minInputVelocity;
-        slider.maxValue = maxInputVelocity;
-    }
+    public float CurrentValue => Mathf.Sqrt(_inputValue);
 
     private void Update()
     {
@@ -44,13 +35,20 @@ public class PlayerInputProvider : MonoBehaviour
 
     private IEnumerator ReadInputCoroutine()
     {
-        _timeElapsed = 0f;
-        _inputValue = minInputVelocity;
         onInputStarted.Invoke();
+        /*
+         *  #NOTE: Where it's mathematically possible, magnitudes are kept squared to avoid
+         *  repeated square root computations.
+         */
+        var min = player.MinShotVelocity.sqrMagnitude;
+        var max = player.MaxShotVelocity.sqrMagnitude;
+
+        _inputValue = player.MinShotVelocity.sqrMagnitude;
+        _timeElapsed = 0f;
         while (_pressed && _timeElapsed <= maxTimeFrame)
         {
-            var speed = (maxInputVelocity - minInputVelocity) / maxTimeFrame;
-            _inputValue = Mathf.Clamp(_inputValue + speed * Time.deltaTime, minInputVelocity, maxInputVelocity);
+            var speed = (max - min) / maxTimeFrame;
+            _inputValue = Mathf.Clamp(_inputValue + speed * Time.deltaTime, min, max);
             Debug.Log($"[{GetType().Name}] Input value: {_inputValue}");
 
             _timeElapsed += Time.deltaTime;
@@ -62,7 +60,7 @@ public class PlayerInputProvider : MonoBehaviour
 
     private void SendInput()
     {
-        onInputPerformed.Invoke(_inputValue);
+        onInputPerformed.Invoke(CurrentValue);
         _pressed = false;
     }
 

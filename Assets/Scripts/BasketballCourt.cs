@@ -17,10 +17,10 @@ public class BasketballCourt : MonoBehaviour
     [Range(0f, 90f)]
     [SerializeField] private float shootingAreaAngle = 60f;
 
+    public Transform HoopBase => hoopBaseTransform;
+
     [Header("Debug")]
     [SerializeField] private bool debug;
-
-    public Transform HoopBase => hoopBaseTransform;
 
     public Vector3 GetHoopTarget(Vector3 playerPosition, ShotType shotType)
     {
