@@ -12,6 +12,7 @@ public class BasketballPlayer : MonoBehaviour
     [Header("References")]
     [SerializeField] private Rigidbody ballRigidbody;
     [SerializeField] private BasketballCourt court;
+    [SerializeField] private PlayerInputProvider inputProvider;
 
     [Header("Parameters")]
     [SerializeField] private float perfectShotAngleCorrection = 45f;
@@ -67,6 +68,16 @@ public class BasketballPlayer : MonoBehaviour
         }, Vector3.Lerp);
     }
 
+    private void OnEnable()
+    {
+        inputProvider.onInputPerformed.AddListener(OnInputReceived);
+    }
+
+    private void OnDisable()
+    {
+        inputProvider.onInputPerformed.AddListener(OnInputReceived);
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.R))
@@ -79,15 +90,17 @@ public class BasketballPlayer : MonoBehaviour
 
     public void OnInputReceived(float inputVelocity)
     {
+        inputVelocity = testVelocity;
+
         if (debug)
             Time.timeScale = timeDilationFactor;
 
         _interpolator.SetPairs(new List<KeyValuePair<float, Vector3>>
         {
-            new(0f, Vector3.zero),
+            new(inputProvider.minInputVelocity*inputProvider.minInputVelocity, inputProvider.minInputVelocity*_perfectShotOptimalVelocity.normalized),
             new(_perfectShotOptimalVelocity.sqrMagnitude, _perfectShotOptimalVelocity),
             new(_backboardShotOptimalVelocity.sqrMagnitude, _backboardShotOptimalVelocity),
-            new(15f*15f, 15f*_backboardShotOptimalVelocity.normalized),
+            new(inputProvider.maxInputVelocity*inputProvider.maxInputVelocity, inputProvider.maxInputVelocity*_backboardShotOptimalVelocity.normalized),
         });
 
         var velocity = _interpolator.Evaluate(inputVelocity * inputVelocity);
@@ -107,12 +120,33 @@ public class BasketballPlayer : MonoBehaviour
         var deltaToGroundAngle = Vector3.Angle(Vector3.ProjectOnPlane(deltaPosition, Vector3.up), deltaPosition);
 
         TryGetPerfectVelocity(start, perfectShotTarget,
+            Mathf.Clamp(perfectShotAngleCorrection, 0, 90),
+            out _perfectShotOptimalVelocity);
+
+        TryGetPerfectVelocity(start, backboardShotTarget,
+            Mathf.Clamp(backboardShotAngleCorrection, 0, 90),
+            out _backboardShotOptimalVelocity);
+
+        /*
+        TryGetPerfectVelocity(start, perfectShotTarget,
             Mathf.Clamp(deltaToGroundAngle + perfectShotAngleCorrection, 0, 90),
             out _perfectShotOptimalVelocity);
 
         TryGetPerfectVelocity(start, backboardShotTarget,
             Mathf.Clamp(deltaToGroundAngle + backboardShotAngleCorrection, 0, 90),
             out _backboardShotOptimalVelocity);
+        */
+        /*
+        var perfectShotOptimalVelocityMagnitude = _perfectShotOptimalVelocity.magnitude;
+
+        _perfectShotOptimalVelocity = Mathf.Clamp(perfectShotOptimalVelocityMagnitude, 
+            inputProvider.minInputVelocity,
+            inputProvider.maxInputVelocity) *_perfectShotOptimalVelocity.normalized;
+
+        _backboardShotOptimalVelocity = Mathf.Clamp(perfectShotOptimalVelocityMagnitude + 1f,
+            inputProvider.minInputVelocity,
+            inputProvider.maxInputVelocity) * _backboardShotOptimalVelocity.normalized;
+        */
     }
 
     private void ShootBall(Vector3 initialVelocity)
@@ -133,7 +167,47 @@ public class BasketballPlayer : MonoBehaviour
         ballTransform.parent = transform;
         ballTransform.SetLocalPositionAndRotation(_defaultPose.position, _defaultPose.rotation);
     }
+    
+    // Tangent impact version
+    private bool TryGetPerfectVelocity(Vector3 start, Vector3 target, float impactAngleDeg, out Vector3 initialVelocity)
+    {
+        initialVelocity = Vector3.zero;
 
+        Vector3 toTarget = target - start;
+        Vector3 toTargetXZ = new Vector3(toTarget.x, 0f, toTarget.z);
+        float deltaX = toTargetXZ.magnitude;
+        float deltaY = toTarget.y;
+
+        float impactRad = impactAngleDeg * Mathf.Deg2Rad;
+        float tanImpact = Mathf.Tan(impactRad);
+
+        float denom = deltaY - deltaX * tanImpact;
+        if (denom <= 0f)
+        {
+            // No valid solution
+            return false;
+        }
+
+        // Horizontal speed
+        float vx = Mathf.Sqrt((Physics.gravity.magnitude * deltaX * deltaX) / (2f * denom));
+
+        // Flight time
+        float T = deltaX / vx;
+
+        // Vertical speed at launch
+        float vy = vx * tanImpact + Physics.gravity.magnitude * T;
+
+        // Direction in XZ plane
+        Vector3 dirXZ = toTargetXZ.normalized;
+
+        // Final velocity vector
+        initialVelocity = dirXZ * vx + Vector3.up * vy;
+
+        return true;
+    }
+    
+
+    /*
     private bool TryGetPerfectVelocity(Vector3 start,  Vector3 target, float angleDeg, out Vector3 initialVelocity)
     {
         initialVelocity = Vector3.zero;
@@ -152,7 +226,7 @@ public class BasketballPlayer : MonoBehaviour
         float denom = 2f * cosAngle * cosAngle * (distanceXZ * tanAngle - deltaY);
         if (denom <= 0f)
         {
-            Debug.LogWarning($"[{GetType().Name}]No valid shot solution for given parameters.");
+            //Debug.LogWarning($"[{GetType().Name}]No valid shot solution for given parameters.");
             return false;
         }
 
@@ -166,7 +240,7 @@ public class BasketballPlayer : MonoBehaviour
         initialVelocity = dirXZ * speed * cosAngle + Vector3.up * speed * Mathf.Sin(angleRad);
         return true;
     }
-
+    */
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
