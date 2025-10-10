@@ -622,12 +622,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 401551102}
   maxTimeFrame: 1
+  pointerAction: {fileID: -5405711690847647916, guid: e5a542b3fd727dd49a0876a598ce2ba1,
+    type: 3}
+  pressAction: {fileID: 8402372055116332552, guid: e5a542b3fd727dd49a0876a598ce2ba1,
+    type: 3}
   onInputStarted:
     m_PersistentCalls:
       m_Calls: []
   onInputPerformed:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &401551109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401551100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: e5a542b3fd727dd49a0876a598ce2ba1,
+    type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &469851005
 GameObject:
   m_ObjectHideFlags: 0
@@ -2417,7 +2452,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -373.95}
+  m_AnchoredPosition: {x: 0, y: -373.95004}
   m_SizeDelta: {x: -59.19998, y: -747.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1455512076
@@ -3602,7 +3637,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -360.1}
+  m_AnchoredPosition: {x: 0, y: -360.10004}
   m_SizeDelta: {x: -59.19998, y: -720.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1938269918
@@ -4578,6 +4613,10 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5089843478552057257, guid: 8643e20733b680c48b98378b98ac9546,
+        type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 401551109}
     - targetCorrespondingSourceObject: {fileID: 5089843478552057257, guid: 8643e20733b680c48b98378b98ac9546,
         type: 3}
       insertIndex: -1
