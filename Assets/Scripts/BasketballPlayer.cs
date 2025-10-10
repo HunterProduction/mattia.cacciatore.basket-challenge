@@ -12,7 +12,7 @@ public class BasketballPlayer : MonoBehaviour
     [Header("References")]
     [SerializeField] private Rigidbody ballRigidbody;
     [SerializeField] private BasketballCourt court;
-    [SerializeField] private PlayerInputProvider inputProvider;
+    [SerializeField] private InputVelocityProvider inputProvider;
 
     [Header("Parameters")]
     [Range(-90f, 0f)]

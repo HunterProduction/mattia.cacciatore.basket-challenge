@@ -3,14 +3,18 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 // #TODO: Rethink class naming.
-public class PlayerInputProvider : MonoBehaviour
+public class InputVelocityProvider : MonoBehaviour
 {
     [SerializeField] private BasketballPlayer player;
-    [SerializeField] private float maxTimeFrame = 2f;
 
     [Header("Input Actions")]
-    [SerializeField] private InputActionReference pointerAction;
     [SerializeField] private InputActionReference pressAction;
+    [SerializeField] private InputActionReference dragAction;
+
+    [Header("Parameters")]
+    [SerializeField] private float maxTimeFrame = 2f;
+    [Range(0f, 2f)]
+    [SerializeField] private float accelerationBoost = 0.2f;
 
     [Header("Events")]
     public UnityEvent onInputStarted;
@@ -42,16 +46,18 @@ public class PlayerInputProvider : MonoBehaviour
         var min = player.MinShotVelocity.sqrMagnitude;
         var max = player.MaxShotVelocity.sqrMagnitude;
 
-        var normalizedPointerDeltaY = Mathf.Clamp01(pointerAction.action.ReadValue<Vector2>().y / Screen.height);
-        _inputValue = Mathf.Clamp(
-                _inputValue + normalizedPointerDeltaY * (max - min),
-                min,
-                max);
+        var deltaPointerPixel = dragAction.action.ReadValue<Vector2>();
 
-        Debug.Log($"[{GetType().Name}] Input value: {_inputValue}");
+        // Normalized delta in [0, 1]
+        var deltaY = Mathf.Clamp01(deltaPointerPixel.y / Screen.height);
+
+        // Acceleration term
+        var gain = 1f + accelerationBoost * (1f - Mathf.Exp(-deltaY / Time.deltaTime));
+
+        var deltaInput = deltaY * (max - min) * gain;
+        _inputValue = Mathf.Clamp(_inputValue + deltaInput, min, max);
 
         _timeElapsed += Time.deltaTime;
-
         if(_timeElapsed > maxTimeFrame)
             SendInput();
     }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Slider))]
 public class UIVelocityProgressBar : MonoBehaviour
 {
-    [SerializeField] private PlayerInputProvider playerInputProvider;
+    [SerializeField] private InputVelocityProvider inputVelocityProvider;
     [SerializeField] private BasketballPlayer player;
 
     [Header("References")]
@@ -29,10 +29,10 @@ public class UIVelocityProgressBar : MonoBehaviour
             }
         }
 
-        if (playerInputProvider == null)
+        if (inputVelocityProvider == null)
         {
-            playerInputProvider = FindObjectOfType<PlayerInputProvider>();
-            if (playerInputProvider == null)
+            inputVelocityProvider = FindObjectOfType<InputVelocityProvider>();
+            if (inputVelocityProvider == null)
             {
                 throw new UnassignedReferenceException("Unable to retrieve reference");
             }
@@ -41,7 +41,7 @@ public class UIVelocityProgressBar : MonoBehaviour
 
     private void Update()
     {
-        UpdateVisuals(playerInputProvider.CurrentValue);
+        UpdateVisuals(inputVelocityProvider.CurrentValue);
     }
 
     private void UpdateVisuals(float currentVelocity)
