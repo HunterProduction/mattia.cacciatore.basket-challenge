@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(RectTransform))]
-public class RelativePositionFitter : MonoBehaviour
+public class UIRelativePositionFitter : MonoBehaviour
 {
     [Tooltip("If null, the immediate parent RectTransform is used.")]
     [SerializeField] private RectTransform parentRect;

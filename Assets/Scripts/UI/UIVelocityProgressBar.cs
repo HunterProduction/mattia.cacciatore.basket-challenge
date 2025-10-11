@@ -9,9 +9,9 @@ public class UIVelocityProgressBar : MonoBehaviour
     [SerializeField] private BasketballPlayer player;
 
     [Header("References")]
-    [SerializeField] private RelativePositionFitter perfectShotMarker;
-    [SerializeField] private RelativePositionFitter backboardShotMarker;
-    [SerializeField] private RelativePositionFitter currentValueMarker;
+    [SerializeField] private UIRelativePositionFitter perfectShotMarker;
+    [SerializeField] private UIRelativePositionFitter backboardShotMarker;
+    [SerializeField] private UIRelativePositionFitter currentValueMarker;
 
     private Slider _slider;
 

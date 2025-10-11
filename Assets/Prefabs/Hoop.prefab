@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 585578619475587}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.43, y: 3.41, z: 0.37}
+  m_LocalPosition: {x: -0.484, y: 3.317, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -56,7 +56,7 @@ Transform:
   m_GameObject: {fileID: 927375084950873456}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.127, y: 3.318, z: 0.371}
+  m_LocalPosition: {x: 0.13, y: 3.318, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -118,7 +118,7 @@ Transform:
   m_GameObject: {fileID: 8244718445997096744}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.6000001, y: 3.41, z: 0.3699999}
+  m_LocalPosition: {x: 0.662, y: 3.317, z: 0.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 9182260786497078705}
   - component: {fileID: 7064615424601474545}
   - component: {fileID: 7704694150485333923}
+  - component: {fileID: 7909694165116924826}
   m_Layer: 0
   m_Name: Hoop
   m_TagString: Untagged
@@ -236,6 +237,26 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: f75e2e3dd3c0f7847b6e3d95f101e29a, type: 3}
+--- !u!114 &7909694165116924826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9000901061403135818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f61d074ec63b944aa9df9bfbd5b61eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseTransform: {fileID: 2552387250164525236}
+  perfectTarget: {fileID: 1403345267668217569}
+  backboardTargetCenter: {fileID: 2901439607982194833}
+  backboardTargetLeft: {fileID: 8210694166644947074}
+  backboardTargetRight: {fileID: 5007580990267005476}
+  hoopTrigger: {fileID: 4290447887977054947}
+  backboardCollision: {fileID: 3886566994054492638}
+  ringCollision: {fileID: 219698766809470304}
 --- !u!1001 &2679160954573024651
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -441,7 +462,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1314037438050228, guid: 453b795a99d8e85448d0c9bc874e58b2,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5096026944625057775}
+      addedObject: {fileID: 4290447887977054947}
   m_SourcePrefab: {fileID: 100100000, guid: 453b795a99d8e85448d0c9bc874e58b2, type: 3}
 --- !u!4 &2729532158642721957 stripped
 Transform:
@@ -477,7 +498,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 2448bd6a5888ad646b8c665e877aaaed, type: 3}
---- !u!114 &5096026944625057775
+--- !u!114 &4290447887977054947
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -492,7 +513,15 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 64
-  onTriggerEnter:
+  sendEventMode: 1
+  sendEventCooldownTime: 1
+  onEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  onExit:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1001 &6048868438124257292
@@ -575,6 +604,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 7198221545292646692}
+    - targetCorrespondingSourceObject: {fileID: 1314037438050228, guid: 453b795a99d8e85448d0c9bc874e58b2,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 219698766809470304}
   m_SourcePrefab: {fileID: 100100000, guid: 453b795a99d8e85448d0c9bc874e58b2, type: 3}
 --- !u!4 &6044161716258937430 stripped
 Transform:
@@ -610,6 +643,32 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 2448bd6a5888ad646b8c665e877aaaed, type: 3}
+--- !u!114 &219698766809470304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6049828364024319928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51f1e39053540cf4db26e6f8c9422e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  sendEventMode: 1
+  sendEventCooldownTime: 2
+  onEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  onExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &6730805359636866033
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -690,7 +749,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1054779504841968, guid: 9521e37e952285346bdcd875e0a2a0f9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3886566994054492638}
   m_SourcePrefab: {fileID: 100100000, guid: 9521e37e952285346bdcd875e0a2a0f9, type: 3}
 --- !u!4 &6730346026791980663 stripped
 Transform:
@@ -698,3 +761,35 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 6730805359636866033}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6731509805598422785 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1054779504841968, guid: 9521e37e952285346bdcd875e0a2a0f9,
+    type: 3}
+  m_PrefabInstance: {fileID: 6730805359636866033}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3886566994054492638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6731509805598422785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51f1e39053540cf4db26e6f8c9422e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  sendEventMode: 1
+  sendEventCooldownTime: 2
+  onEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  onExit:
+    m_PersistentCalls:
+      m_Calls: []
