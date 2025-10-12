@@ -10,6 +10,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     [Header("References")]
     [SerializeField] private BasketballHoop hoop;
     [SerializeField] private BasketballCourt court;
+    [SerializeField] private BasketballCameraTarget cameraTarget;
 
     [Header("Score")]
     [SerializeField] private int perfectShotScore = 5;
@@ -85,9 +86,12 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
 
     private IEnumerator PointScoredCoroutine(BasketballPlayer player)
     {
+        cameraTarget.enabled = false;
+
         yield return new WaitForSeconds(scoreNotificationTime);
 
         court.SetPlayerNextPosition(player);
+        cameraTarget.enabled = true;
     }
 
     private IEnumerator ShotTimeoutCoroutine(BasketballPlayer player)
