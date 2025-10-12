@@ -4,23 +4,21 @@ using UnityEngine;
 [RequireComponent(typeof(TextMeshProUGUI))]
 public class UIPlayerScoreCounter : MonoBehaviour
 {
-    [SerializeField] private BasketballGameManager gameManager;
     [SerializeField] private BasketballPlayer player;
 
     private TextMeshProUGUI _text;
+    private BasketballGameManager _gameManager;
 
     private void Awake()
     {
         _text = GetComponent<TextMeshProUGUI>();
 
-        if(gameManager == null)
-        {
-            gameManager = FindObjectOfType<BasketballGameManager>();
-        }
+        // Caching game manager instance to avoid continuous singleton property access and null check.
+        _gameManager = BasketballGameManager.Instance;
     }
 
     private void Update()
     {
-        _text.text = gameManager.GetPlayerScore(player).ToString();
+        _text.text = _gameManager.GetPlayerScore(player).ToString();
     }
 }

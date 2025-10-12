@@ -377,8 +377,8 @@ MonoBehaviour:
   inputProvider: {fileID: 4701333757358738023}
   perfectShotTangentAngle: -55
   backboardShotTangentAngle: -15
-  minShotFactor: 0.9
-  maxShotFactor: 1.05
+  minShotFactor: 0.88
+  maxShotFactor: 1.03
   onBallShot:
     m_PersistentCalls:
       m_Calls: []

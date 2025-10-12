@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public enum ShotType
 {
@@ -47,7 +50,7 @@ public class BasketballHoop : MonoBehaviour
     private void Awake()
     {
         _ballShotRegister = new Dictionary<int, ShotType>();
-        foreach (var player in FindObjectsByType<BasketballPlayer>(FindObjectsSortMode.None))
+        foreach (var player in BasketballGameManager.Instance.Players)
         {
             _ballShotRegister.Add(player.Ball.GetInstanceID(), ShotType.Miss);
         }
@@ -85,7 +88,8 @@ public class BasketballHoop : MonoBehaviour
 
         Debug.Log($"[{GetType().Name}] {ringCollision.gameObject.name}({ballId}) touched Ring.");
 
-        _ballShotRegister[ballId] = ShotType.RingShot;
+        if (_ballShotRegister[ballId] != ShotType.BackboardShot)
+            _ballShotRegister[ballId] = ShotType.RingShot;
     }
      
     private void OnBallTouchedBackboard(Collision barkboardCollision)
@@ -105,4 +109,21 @@ public class BasketballHoop : MonoBehaviour
             hoopTrigger.entered -= OnBallEntered;
         }
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        Handles.color = new Color(0, 1, 0, .4f);
+        var radius = 0.1f;
+
+        if (perfectTarget != null)
+            Handles.DrawSolidDisc(perfectTarget.position, transform.up, radius);
+        if(backboardTargetCenter != null)
+            Handles.DrawSolidDisc(backboardTargetCenter.position, transform.forward, radius);
+        if (backboardTargetLeft != null)
+            Handles.DrawSolidDisc(backboardTargetLeft.position, transform.forward, radius);
+        if (backboardTargetRight != null)
+            Handles.DrawSolidDisc(backboardTargetRight.position, transform.forward, radius);
+    }
+#endif
 }

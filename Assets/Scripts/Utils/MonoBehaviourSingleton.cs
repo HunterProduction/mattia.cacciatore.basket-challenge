@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-50)]
 public class MonoBehaviourSingleton<T> : MonoBehaviour where T : Component
 {
     [SerializeField] private bool dontDestroyOnLoad = true;

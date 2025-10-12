@@ -51,7 +51,7 @@ public class BasketballPlayer : MonoBehaviour
 
     private bool _computeVelocities = true;
     private float _gravityMagnitude;
-    private Pose _defaultPose;
+    private Pose _defaultBallPose;
     private MultiInterpolator<Vector3> _interpolator;
 
     private void Awake()
@@ -75,8 +75,8 @@ public class BasketballPlayer : MonoBehaviour
             }
         }
 
-        _defaultPose.position = ballRigidbody.transform.localPosition;
-        _defaultPose.rotation = ballRigidbody.transform.localRotation;
+        _defaultBallPose.position = ballRigidbody.transform.localPosition;
+        _defaultBallPose.rotation = ballRigidbody.transform.localRotation;
 
         ResetBall();
 
@@ -161,7 +161,7 @@ public class BasketballPlayer : MonoBehaviour
         ballRigidbody.isKinematic = true;
         var ballTransform = ballRigidbody.transform;
         ballTransform.parent = transform;
-        ballTransform.SetLocalPositionAndRotation(_defaultPose.position, _defaultPose.rotation);
+        ballTransform.SetLocalPositionAndRotation(_defaultBallPose.position, _defaultBallPose.rotation);
 
         inputProvider.enabled = true;
         _computeVelocities = true;

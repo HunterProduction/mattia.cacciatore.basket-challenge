@@ -1,13 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // #TODO: Consider making this a singleton 
-public class BasketballGameManager : MonoBehaviour
+public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManager>
 {
     [Header("References")]
     [SerializeField] private BasketballHoop hoop;
+    [SerializeField] private BasketballCourt court;
 
     [Header("Score")]
     [SerializeField] private int perfectShotScore = 5;
@@ -18,33 +20,11 @@ public class BasketballGameManager : MonoBehaviour
     [SerializeField] private float shootTimeoutTime = 2.5f;
     [SerializeField] private float scoreNotificationTime = 1.5f;
 
-    private Dictionary<int, BasketballPlayer> _playerIdsMap;
+    private Dictionary<int, BasketballPlayer> _playersIdMap;
     private Dictionary<int, int> _playerBallScoresMap;
     private Dictionary<int, int> _ballToPlayerIdsMap;
 
-    private void Awake()
-    {
-        if(hoop == null)
-        {
-            hoop = FindObjectOfType<BasketballHoop>();
-        }
-
-        _playerIdsMap = new Dictionary<int, BasketballPlayer>();
-        _playerBallScoresMap = new Dictionary<int, int>();
-        _ballToPlayerIdsMap = new Dictionary<int, int>();
-
-        var players = FindObjectsByType<BasketballPlayer>(FindObjectsSortMode.None);
-        foreach (var player in players)
-        {
-            _playerIdsMap.Add(player.GetInstanceID(), player);
-            _playerBallScoresMap.Add(player.Ball.GetInstanceID(), 0);
-            _ballToPlayerIdsMap.Add(player.Ball.GetInstanceID(), player.GetInstanceID());
-
-            player.onBallShot.AddListener(() => StartCoroutine(ShotTimeoutCoroutine(player)));
-        }
-
-        hoop.onPointScored.AddListener(OnPointScored);
-    }
+    public BasketballPlayer[] Players => _playersIdMap.Values.ToArray();
 
     public int GetPlayerScore(BasketballPlayer player)
     {
@@ -53,7 +33,38 @@ public class BasketballGameManager : MonoBehaviour
 
     public int GetPlayerScore(int playerId)
     {
-        return _playerBallScoresMap[_playerIdsMap[playerId].Ball.GetInstanceID()];
+        return _playerBallScoresMap[_playersIdMap[playerId].Ball.GetInstanceID()];
+    }
+
+    public override void Awake()
+    {
+        base.Awake();
+
+        if(hoop == null)
+        {
+            hoop = FindObjectOfType<BasketballHoop>();
+        }
+
+        if(court == null)
+        {
+            court = FindObjectOfType<BasketballCourt>();
+        }
+
+        _playersIdMap = new Dictionary<int, BasketballPlayer>();
+        _playerBallScoresMap = new Dictionary<int, int>();
+        _ballToPlayerIdsMap = new Dictionary<int, int>();
+
+        var players = FindObjectsByType<BasketballPlayer>(FindObjectsSortMode.None);
+        foreach (var player in players)
+        {
+            _playersIdMap.Add(player.GetInstanceID(), player);
+            _playerBallScoresMap.Add(player.Ball.GetInstanceID(), 0);
+            _ballToPlayerIdsMap.Add(player.Ball.GetInstanceID(), player.GetInstanceID());
+
+            player.onBallShot.AddListener(() => StartCoroutine(ShotTimeoutCoroutine(player)));
+        }
+
+        hoop.onPointScored.AddListener(OnPointScored);
     }
 
     private void OnPointScored(ScoredPointArgs scoredPointArgs)
@@ -67,7 +78,7 @@ public class BasketballGameManager : MonoBehaviour
         };
         _playerBallScoresMap[scoredPointArgs.ballId] += score;
 
-        var player = _playerIdsMap[_ballToPlayerIdsMap[scoredPointArgs.ballId]];
+        var player = _playersIdMap[_ballToPlayerIdsMap[scoredPointArgs.ballId]];
         Debug.Log($"[{GetType().Name}] Player {player.name} scored {score} points");
         StartCoroutine(PointScoredCoroutine(player));
     }
@@ -76,7 +87,7 @@ public class BasketballGameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(scoreNotificationTime);
 
-        player.ResetPlayer(player.transform.position);
+        court.SetPlayerNextPosition(player);
     }
 
     private IEnumerator ShotTimeoutCoroutine(BasketballPlayer player)
