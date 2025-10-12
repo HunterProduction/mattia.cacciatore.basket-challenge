@@ -17,9 +17,9 @@ public class BasketballCourt : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool debug;
 
-    public Vector3 GetHoopTarget(Vector3 playerPosition, ShotType shotType)
+    public Vector3 GetHoopTarget(Vector3 playerPosition, BasketballPlayer.ShotAimMode shotType)
     {
-        if(shotType == ShotType.Perfect)
+        if(shotType == BasketballPlayer.ShotAimMode.Perfect)
         {
             return hoop.PerfectTarget.position;
         }

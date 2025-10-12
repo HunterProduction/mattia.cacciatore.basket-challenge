@@ -379,6 +379,9 @@ MonoBehaviour:
   backboardShotTangentAngle: -15
   minShotFactor: 0.9
   maxShotFactor: 1.05
+  onBallShot:
+    m_PersistentCalls:
+      m_Calls: []
   debug: 1
   previewShotType: 1
   timeDilationFactor: 1
@@ -399,7 +402,7 @@ MonoBehaviour:
     type: 3}
   dragAction: {fileID: -5405711690847647916, guid: e5a542b3fd727dd49a0876a598ce2ba1,
     type: 3}
-  maxTimeFrame: 5
+  maxTimeFrame: 1
   accelerationBoost: 1
   onInputStarted:
     m_PersistentCalls:

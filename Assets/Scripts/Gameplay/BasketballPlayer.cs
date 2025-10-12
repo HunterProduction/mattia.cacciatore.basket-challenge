@@ -1,16 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
-
-public enum ShotType
-{
-    Perfect,
-    Backboard
-}
+using UnityEngine.Events;
 
 public class BasketballPlayer : MonoBehaviour
 {
+    public enum ShotAimMode
+    {
+        Perfect,
+        Backboard
+    }
+
     [Header("References")]
     [SerializeField] private Rigidbody ballRigidbody;
+    public Rigidbody Ball => ballRigidbody;
+
     [SerializeField] private BasketballCourt court;
     [SerializeField] private InputVelocityProvider inputProvider;
 
@@ -24,9 +27,12 @@ public class BasketballPlayer : MonoBehaviour
     [Range(1f, 1.2f)]
     [SerializeField] private float maxShotFactor = 1.05f;
 
+    [Header("Events")]
+    public UnityEvent onBallShot;
+
     [Header("Debug")]
     [SerializeField] private bool debug = false;
-    [SerializeField] private ShotType previewShotType = ShotType.Perfect;
+    [SerializeField] private ShotAimMode previewShotType = ShotAimMode.Perfect;
     [Range(0.1f, 1f)]
     [SerializeField] private float timeDilationFactor = 1f;
 
@@ -113,6 +119,8 @@ public class BasketballPlayer : MonoBehaviour
         if (debug)
             Time.timeScale = timeDilationFactor;
 
+        inputProvider.enabled = false;
+
         _interpolator.SetPairs(new List<KeyValuePair<float, Vector3>>
         {
             new(_minShotVelocity.sqrMagnitude, _minShotVelocity),
@@ -135,6 +143,14 @@ public class BasketballPlayer : MonoBehaviour
         ballRigidbody.isKinematic = false;
         ballRigidbody.AddForce(initialVelocity, ForceMode.VelocityChange);
         ballRigidbody.AddTorque(-ballRigidbody.transform.right * Random.Range(0, 1f));
+
+        onBallShot?.Invoke();
+    }
+
+    public void ResetPlayer(Vector3 newShootPosition)
+    {
+        transform.position = newShootPosition;
+        ResetBall();
     }
 
     private void ResetBall()
@@ -147,6 +163,7 @@ public class BasketballPlayer : MonoBehaviour
         ballTransform.parent = transform;
         ballTransform.SetLocalPositionAndRotation(_defaultPose.position, _defaultPose.rotation);
 
+        inputProvider.enabled = true;
         _computeVelocities = true;
     }
 
@@ -154,8 +171,8 @@ public class BasketballPlayer : MonoBehaviour
     {
         var start = ballRigidbody.transform.position;
 
-        var backboardShotTarget = court.GetHoopTarget(transform.position, ShotType.Backboard);
-        var perfectShotTarget = court.GetHoopTarget(transform.position, ShotType.Perfect);
+        var backboardShotTarget = court.GetHoopTarget(transform.position, ShotAimMode.Backboard);
+        var perfectShotTarget = court.GetHoopTarget(transform.position, ShotAimMode.Perfect);
 
         TryGetPerfectVelocity(start, perfectShotTarget,
             perfectShotTangentAngle,
@@ -207,6 +224,11 @@ public class BasketballPlayer : MonoBehaviour
         return true;
     }
 
+    private void OnDestroy()
+    {
+        onBallShot.RemoveAllListeners();
+    }
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -224,7 +246,7 @@ public class BasketballPlayer : MonoBehaviour
 
         Gizmos.color = Color.red;
         var delta = target - ballRigidbody.position;
-        var angleCorrection = previewShotType == ShotType.Perfect ? perfectShotTangentAngle : backboardShotTangentAngle;
+        var angleCorrection = previewShotType == ShotAimMode.Perfect ? perfectShotTangentAngle : backboardShotTangentAngle;
         Gizmos.DrawLine(target, target + Quaternion.AngleAxis(angleCorrection, Vector3.Cross(delta, Vector3.up)) * ballRigidbody.transform.forward);
     }
 #endif

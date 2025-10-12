@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class MonoBehaviourSingleton<T> : MonoBehaviour where T : Component
 {
+    [SerializeField] private bool dontDestroyOnLoad = true;
     public static bool IsAvailable => _instance != null;
 
     private static T _instance;
@@ -34,7 +35,8 @@ public class MonoBehaviourSingleton<T> : MonoBehaviour where T : Component
         else
         {
             _instance = this as T;
-            DontDestroyOnLoad(this.gameObject);
+            if(dontDestroyOnLoad)
+                DontDestroyOnLoad(this.gameObject);
         }
     }
 }
