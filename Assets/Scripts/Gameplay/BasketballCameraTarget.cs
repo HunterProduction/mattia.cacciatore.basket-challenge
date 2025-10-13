@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BasketballCameraTarget : MonoBehaviour
 {
-    [Header("Follow")]
+    [Header("Focus")]
     public Transform ballTransform;
 
     [Header("Reference")]

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManager>
 {
@@ -11,6 +12,8 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     [SerializeField] private BasketballHoop hoop;
     [SerializeField] private BasketballCourt court;
     [SerializeField] private BasketballCameraTarget cameraTarget;
+    [SerializeField] private SceneLoader endGameSceneLoader;
+    [SerializeField] private PlayerInput input;
 
     [Header("Game Data")]
     [SerializeField] private GameConfigData gameConfig;
@@ -19,6 +22,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     [Header("Time")]
     [SerializeField] private float shootTimeoutTime = 2.5f;
     [SerializeField] private float scoreNotificationTime = 1.5f;
+    [SerializeField] private float endGameNotificationTime = 3f;
 
     [Header("Events")]
     public UnityEvent onGameOver;
@@ -68,9 +72,17 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
             court = FindObjectOfType<BasketballCourt>();
         }
 
+        if (input == null)
+        {
+            input = FindObjectOfType<PlayerInput>();
+        }
+        
         _currentActiveBonuses = new Dictionary<string, ShotScoreBonus>();
-        _playerScoresMap = new Dictionary<BasketballPlayer, int>();
+        _playerScoresMap = new Dictionary<BasketballPlayer, int>();        
+    }
 
+    private void Start()
+    {
         var players = FindObjectsByType<BasketballPlayer>(FindObjectsSortMode.None);
         foreach (var player in players)
         {
@@ -79,6 +91,8 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         }
 
         hoop.onPointScored.AddListener(OnPointScored);
+
+        gameResult.Initialize(players);
     }
 
     private void Update()
@@ -86,14 +100,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         _gameTimeElapsed += Time.deltaTime;
         if(_gameTimeElapsed >= gameConfig.gameDuration)
         {
-            Debug.Log($"[{GetType().Name}] Game Over!");
-
-            var scores = _playerScoresMap.Values.ToArray();
-            Array.Sort(scores);
-
-            // #TODO: #MattiaCacciatore Retrieve user's player and determin match result.
-
-            onGameOver?.Invoke();
+            EndGame();
         }
     }
 
@@ -115,11 +122,43 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
                 bonus.ApplyBonus(ref score);
         }
 
+        Debug.Log($"[{GetType().Name}] Player {scoredPointArgs.player.name} scored {score} points");
+
         // Update player score
         _playerScoresMap[scoredPointArgs.player] += score;
 
-        Debug.Log($"[{GetType().Name}] Player {scoredPointArgs.player.name} scored {score} points");
+        // Update player stats
+        gameResult.GetPlayerStats(scoredPointArgs.player.Id).score = _playerScoresMap[scoredPointArgs.player];
         StartCoroutine(PointScoredCoroutine(scoredPointArgs.player));
+    }
+
+    private void EndGame()
+    {
+        Debug.Log($"[{GetType().Name}] Game Over!");
+        StopAllCoroutines();
+        input.enabled = false;
+        this.enabled = false;
+
+        BasketballPlayer winner = null;
+        var maxScore = -Mathf.Infinity;
+        foreach (var pair in _playerScoresMap)
+        {
+            var player = pair.Key;
+            player.enabled = false;
+
+            if (pair.Value > maxScore)
+            {
+                maxScore = pair.Value;
+                winner = player;
+            }
+        }
+        if (winner.IsUser)
+            gameResult.matchResult = MatchResult.Win;
+
+        // #TODO: #MattiaCacciatore Retrieve user's player and determin match result.
+
+        onGameOver?.Invoke();
+        StartCoroutine(GameOverCoroutine());
     }
 
     private void OnDestroy()
@@ -164,5 +203,13 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         yield return new WaitForSeconds(expiresIn);
         _currentActiveBonuses.Remove(bonus.Id);
     }
+
+    private IEnumerator GameOverCoroutine()
+    {
+        yield return new WaitForSeconds(endGameNotificationTime);
+        
+        endGameSceneLoader.Load();
+    }
+
     #endregion
 }

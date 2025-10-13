@@ -79,6 +79,11 @@ public class CameraFollowTarget : MonoBehaviour
         }
     }
 
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
+    }
+
     public void SnapToTarget()
     {
         if (target == null) return;

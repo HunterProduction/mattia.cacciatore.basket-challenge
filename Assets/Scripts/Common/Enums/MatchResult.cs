@@ -1,4 +1,4 @@
 ﻿public enum MatchResult
 {
-    Win, Lose
+    Ongoing, Win, Lose
 }

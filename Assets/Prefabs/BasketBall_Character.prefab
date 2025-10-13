@@ -436,6 +436,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cfa8aed3002deb42bf3651130f13b29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 
+  isUser: 1
   ball: {fileID: 758343530775340651}
   court: {fileID: 0}
   inputProvider: {fileID: 4701333757358738023}
@@ -444,6 +446,9 @@ MonoBehaviour:
   minShotFactor: 0.88
   maxShotFactor: 1.03
   onBallShot:
+    m_PersistentCalls:
+      m_Calls: []
+  onPositionReset:
     m_PersistentCalls:
       m_Calls: []
   debug: 1

@@ -46,7 +46,7 @@ public class BasketballHoop : MonoBehaviour
 
     private Dictionary<BasketballBall, ShotType> _ballShotRegister;
 
-    private void Awake()
+    private void Start()
     {
         _ballShotRegister = new Dictionary<BasketballBall, ShotType>();
         foreach (var player in BasketballGameManager.Instance.Players)

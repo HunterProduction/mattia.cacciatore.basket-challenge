@@ -15,7 +15,7 @@ MonoBehaviour:
   perfectShotScore: 5
   ringShotScore: 2
   backboardShotScore: 2
-  gameDuration: 60
-  commonEventFrequencyPerSecond: 0.1
-  uncommonEventFrequencyPerSecond: 0.05
-  rareEventFrequencyPerSecond: 0.025
+  gameDuration: 20
+  commonEventFrequencyPerSecond: 0.05
+  uncommonEventFrequencyPerSecond: 0.025
+  rareEventFrequencyPerSecond: 0.0125

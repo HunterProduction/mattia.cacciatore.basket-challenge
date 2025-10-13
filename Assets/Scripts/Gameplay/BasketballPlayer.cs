@@ -10,6 +10,14 @@ public class BasketballPlayer : MonoBehaviour
         Backboard
     }
 
+    [SerializeField] private string id;
+    public string Id => id;
+    /**
+     * #NOTE: #MattiaCacciatore This is a just simple placeholder way to fake the identification of the local player. 
+     */
+    [SerializeField] private bool isUser;
+    public bool IsUser => isUser;
+
     [Header("References")]
     [SerializeField] private BasketballBall ball;
     public BasketballBall Ball => ball;
@@ -56,6 +64,11 @@ public class BasketballPlayer : MonoBehaviour
 
     private void Awake()
     {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            id = "Player_" + GetInstanceID();
+        }
+
         // #TODO: Find a smarter way to generalize this repeated check pattern.
         if (ball == null)
         {
