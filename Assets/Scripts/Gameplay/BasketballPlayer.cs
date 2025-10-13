@@ -11,8 +11,8 @@ public class BasketballPlayer : MonoBehaviour
     }
 
     [Header("References")]
-    [SerializeField] private Rigidbody ballRigidbody;
-    public Rigidbody Ball => ballRigidbody;
+    [SerializeField] private BasketballBall ball;
+    public BasketballBall Ball => ball;
 
     [SerializeField] private BasketballCourt court;
     [SerializeField] private InputVelocityProvider inputProvider;
@@ -29,6 +29,7 @@ public class BasketballPlayer : MonoBehaviour
 
     [Header("Events")]
     public UnityEvent onBallShot;
+    public UnityEvent onPositionReset;
 
     [Header("Debug")]
     [SerializeField] private bool debug = false;
@@ -51,16 +52,15 @@ public class BasketballPlayer : MonoBehaviour
 
     private bool _computeVelocities = true;
     private float _gravityMagnitude;
-    private Pose _defaultBallPose;
     private MultiInterpolator<Vector3> _interpolator;
 
     private void Awake()
     {
         // #TODO: Find a smarter way to generalize this repeated check pattern.
-        if (ballRigidbody == null)
+        if (ball == null)
         {
-            ballRigidbody = GetComponentInChildren<Rigidbody>();
-            if(ballRigidbody == null)
+            ball = GetComponentInChildren<BasketballBall>();
+            if(ball == null)
             {
                 throw new UnassignedReferenceException("Unable to retrieve reference");
             }
@@ -75,10 +75,8 @@ public class BasketballPlayer : MonoBehaviour
             }
         }
 
-        _defaultBallPose.position = ballRigidbody.transform.localPosition;
-        _defaultBallPose.rotation = ballRigidbody.transform.localRotation;
-
-        ResetBall();
+        ball.Owner = this;
+        ball.Reset();
 
         // Caching gravity magnitude to spare square root computing
         _gravityMagnitude = Physics.gravity.magnitude;       
@@ -106,12 +104,6 @@ public class BasketballPlayer : MonoBehaviour
         {
             UpdateShotOptimalVelocities();
         }
-
-        // Debug
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            ResetBall();
-        }
     }
 
     public void OnInputReceived(float inputVelocity)
@@ -138,38 +130,25 @@ public class BasketballPlayer : MonoBehaviour
     private void ShootBall(Vector3 initialVelocity)
     {
         _computeVelocities = false;
-
-        ballRigidbody.transform.parent = null;
-        ballRigidbody.isKinematic = false;
-        ballRigidbody.AddForce(initialVelocity, ForceMode.VelocityChange);
-        ballRigidbody.AddTorque(-ballRigidbody.transform.right * Random.Range(0, 1f));
-
+        ball.Shoot(initialVelocity);
         onBallShot?.Invoke();
     }
 
     public void ResetPlayer(Vector3 newShootPosition)
     {
-        transform.position = newShootPosition;
-        ResetBall();
-    }
-
-    private void ResetBall()
-    {
         if (debug)
             Time.timeScale = 1;
 
-        ballRigidbody.isKinematic = true;
-        var ballTransform = ballRigidbody.transform;
-        ballTransform.parent = transform;
-        ballTransform.SetLocalPositionAndRotation(_defaultBallPose.position, _defaultBallPose.rotation);
-
+        transform.position = newShootPosition;
+        ball.Reset();
+        onPositionReset?.Invoke();
         inputProvider.enabled = true;
         _computeVelocities = true;
     }
 
     private void UpdateShotOptimalVelocities()
     {
-        var start = ballRigidbody.transform.position;
+        var start = ball.transform.position;
 
         var backboardShotTarget = court.GetHoopTarget(transform.position, ShotAimMode.Backboard);
         var perfectShotTarget = court.GetHoopTarget(transform.position, ShotAimMode.Perfect);
@@ -220,13 +199,14 @@ public class BasketballPlayer : MonoBehaviour
         Vector3 dirXZ = toTargetXZ.normalized;
 
         // Final 3D velocity vector
-        initialVelocity = dirXZ * speed * cosLaunch + Vector3.up * speed * Mathf.Sin(launchAngleRad);
+        initialVelocity = cosLaunch * speed * dirXZ + Mathf.Sin(launchAngleRad) * speed * Vector3.up;
         return true;
     }
 
     private void OnDestroy()
     {
         onBallShot.RemoveAllListeners();
+        onPositionReset.RemoveAllListeners();
     }
 
 #if UNITY_EDITOR
@@ -235,19 +215,19 @@ public class BasketballPlayer : MonoBehaviour
         if (!debug)
             return;
 
-        if (ballRigidbody == null || court == null)
+        if (ball == null || court == null)
             return;
 
         // Ball trajectory Gizmos
         var target = court.GetHoopTarget(transform.position, previewShotType);
         Gizmos.color = Color.blue;
-        Gizmos.DrawLine(ballRigidbody.position, target);
+        Gizmos.DrawLine(ball.transform.position, target);
         Gizmos.DrawWireSphere(target, .18f);
 
         Gizmos.color = Color.red;
-        var delta = target - ballRigidbody.position;
+        var delta = target - ball.transform.position;
         var angleCorrection = previewShotType == ShotAimMode.Perfect ? perfectShotTangentAngle : backboardShotTangentAngle;
-        Gizmos.DrawLine(target, target + Quaternion.AngleAxis(angleCorrection, Vector3.Cross(delta, Vector3.up)) * ballRigidbody.transform.forward);
+        Gizmos.DrawLine(target, target + Quaternion.AngleAxis(angleCorrection, Vector3.Cross(delta, Vector3.up)) * ball.transform.forward);
     }
 #endif
 }

@@ -61,5 +61,4 @@ public class UIVelocityProgressBar : MonoBehaviour
         perfectShotMarker.Percent = new Vector2(0.5f, (player.PerfectShotOptimalVelocity.sqrMagnitude-min) / (max-min));
         backboardShotMarker.Percent = new Vector2(0.5f, (player.BackboardShotOptimalVelocity.sqrMagnitude-min) / (max - min));
     }
-
 }

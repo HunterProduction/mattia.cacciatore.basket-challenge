@@ -18,19 +18,19 @@ public class UIScoreBonusText : MonoBehaviour
         _text = GetComponent<TMP_Text>();
     }
 
-    public void UpdateText(ScoreBonus bonus)
+    public void UpdateText(Bonus bonus)
     {
-        var bonusText = bonus.value.ToString();
+        var bonusText = bonus.Value.ToString();
 
         // Bonus type notation
-        bonusText = bonus.type switch
+        bonusText = bonus.Type switch
         {
-            ScoreBonus.Type.Additive => "+" + bonusText,
-            ScoreBonus.Type.Multiplicative => bonusText + "x",
+            Bonus.ApplyType.Additive => "+" + bonusText,
+            Bonus.ApplyType.Multiplicative => bonusText + "x",
             _ => throw new System.NotImplementedException(),
         };
 
         _text.text = bonusText;
-        _text.color = bonus.rarity.GetColor();
+        _text.color = bonus.Rarity.GetColor();
     }
 }

@@ -1,5 +1,55 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &318899802560119556
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8169365298529107210}
+  - component: {fileID: 5771555639076444066}
+  m_Layer: 6
+  m_Name: Camera Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8169365298529107210
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318899802560119556}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.08715578, y: 0.000000029802322, z: -9.313226e-10, w: 0.9961948}
+  m_LocalPosition: {x: -0.00000011920929, y: 1.1970706, z: -3.2889237}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 152365932802140451}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5771555639076444066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318899802560119556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f049561346a3f2c478a2eb838f287e25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ballTransform: {fileID: 152365932802140451}
+  player: {fileID: 3019230651253069509}
+  armLength: 3.5
+  armPitchCorrection: 20
+  lookAtTargetPitchCorrection: -10
+  updateMethod: 2
 --- !u!1001 &1093662102373177254
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -65,8 +115,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 950303368843656837, guid: 7a6d9c8977ca43f459b8e57c9b58f7f9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8169365298529107210}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 467238898904867903, guid: 7a6d9c8977ca43f459b8e57c9b58f7f9,
+        type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 758343530775340651}
     - targetCorrespondingSourceObject: {fileID: 467238898904867903, guid: 7a6d9c8977ca43f459b8e57c9b58f7f9,
         type: 3}
       insertIndex: -1
@@ -84,6 +142,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1093662102373177254}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &758343530775340651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672866682074215321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403cfe6df22f327499f517c65e0f1fef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!96 &5115005740740958495
 TrailRenderer:
   serializedVersion: 3
@@ -126,7 +196,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 5
+  m_Time: 1
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -135,8 +205,8 @@ TrailRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.80236816
-        value: 0.046655655
+        time: 0.44488525
+        value: 0.029047012
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -157,8 +227,8 @@ TrailRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0, b: 0, a: 1}
-      key1: {r: 0.49056602, g: 0, b: 0, a: 0}
+      key0: {r: 1, g: 0.88986546, b: 0.7122642, a: 0.74509805}
+      key1: {r: 0.8679245, g: 0.8679245, b: 0.8679245, a: 0.7058824}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -173,10 +243,10 @@ TrailRenderer:
       ctime5: 0
       ctime6: 0
       ctime7: 0
-      atime0: 54741
-      atime1: 65535
-      atime2: 0
-      atime3: 0
+      atime0: 0
+      atime1: 47031
+      atime2: 65535
+      atime3: 65535
       atime4: 0
       atime5: 0
       atime6: 0
@@ -184,7 +254,7 @@ TrailRenderer:
       m_Mode: 0
       m_ColorSpace: 0
       m_NumColorKeys: 2
-      m_NumAlphaKeys: 2
+      m_NumAlphaKeys: 3
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
@@ -197,12 +267,6 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
---- !u!54 &1079307820511877271 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 132591609101143857, guid: 7a6d9c8977ca43f459b8e57c9b58f7f9,
-    type: 3}
-  m_PrefabInstance: {fileID: 1093662102373177254}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5090875608481748029
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -225,7 +289,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.83
       objectReference: {fileID: 0}
     - target: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_LocalPosition.y
@@ -233,11 +297,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.45
+      value: 1.14
       objectReference: {fileID: 0}
     - target: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9999808
+      value: 0.99358886
       objectReference: {fileID: 0}
     - target: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_LocalRotation.x
@@ -245,7 +309,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.0061983312
+      value: 0.11305419
       objectReference: {fileID: 0}
     - target: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_LocalRotation.z
@@ -372,11 +436,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cfa8aed3002deb42bf3651130f13b29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballRigidbody: {fileID: 1079307820511877271}
+  ball: {fileID: 758343530775340651}
   court: {fileID: 0}
   inputProvider: {fileID: 4701333757358738023}
   perfectShotTangentAngle: -55
-  backboardShotTangentAngle: -15
+  backboardShotTangentAngle: -20
   minShotFactor: 0.88
   maxShotFactor: 1.03
   onBallShot:

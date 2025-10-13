@@ -10,12 +10,12 @@ using UnityEditor;
 public struct ScoredPointArgs
 {
     public ShotType shotType;
-    public int ballId;
+    public BasketballPlayer player;
 
-    public ScoredPointArgs(ShotType shotType, int ballId)
+    public ScoredPointArgs(ShotType shotType, BasketballPlayer player)
     {
         this.shotType = shotType;
-        this.ballId = ballId;
+        this.player = player;
     }
 }
 
@@ -42,16 +42,16 @@ public class BasketballHoop : MonoBehaviour
 
     [Header("Events")]
     public UnityEvent<ScoredPointArgs> onPointScored;
-    public UnityEvent<ScoreBonus> onBackboardBonusStarted, onBackboardBonusEnded;
+    public UnityEvent<ShotScoreBonus> onBackboardBonusStarted, onBackboardBonusEnded;
 
-    private Dictionary<int, ShotType> _ballShotRegister;
+    private Dictionary<BasketballBall, ShotType> _ballShotRegister;
 
     private void Awake()
     {
-        _ballShotRegister = new Dictionary<int, ShotType>();
+        _ballShotRegister = new Dictionary<BasketballBall, ShotType>();
         foreach (var player in BasketballGameManager.Instance.Players)
         {
-            _ballShotRegister.Add(player.Ball.GetInstanceID(), ShotType.Miss);
+            _ballShotRegister.Add(player.Ball, ShotType.Miss);
         }
     }
 
@@ -75,39 +75,51 @@ public class BasketballHoop : MonoBehaviour
 
     private void OnBallEntered(Collider ballCollider)
     {
-        var ballId = ballCollider.attachedRigidbody.GetInstanceID();
+        if (!ballCollider.gameObject.TryGetComponent<BasketballBall>(out var ball))
+        {
+            Debug.LogError($"[{GetType().Name}] {ballCollider.gameObject.name} has no BasketballBall component.", ringCollision.gameObject);
+            return;
+        }
 
-        var shotType = _ballShotRegister[ballId];
+        var shotType = _ballShotRegister[ball];
         if (shotType != ShotType.RingShot && shotType != ShotType.BackboardShot)
             shotType = ShotType.PerfectShot;
 
-        Debug.Log($"[{GetType().Name}] {ballCollider.gameObject.name}({ballId}) {shotType} scored!");
-        onPointScored?.Invoke(new ScoredPointArgs(shotType, ballId));
+        Debug.Log($"[{GetType().Name}] {ballCollider.gameObject.name} {shotType} scored!");
+        onPointScored?.Invoke(new ScoredPointArgs(shotType, ball.Owner));
 
-        _ballShotRegister[ballId] = ShotType.Miss;
+        _ballShotRegister[ball] = ShotType.Miss;
     }
 
     private void OnBallTouchedRing(Collision ringCollision)
     {
-        var ballId = ringCollision.rigidbody.GetInstanceID();
+        if(!ringCollision.gameObject.TryGetComponent<BasketballBall>(out var ball))
+        {
+            Debug.LogError($"[{GetType().Name}] {ringCollision.gameObject.name} has no BasketballBall component.", ringCollision.gameObject);
+            return;
+        }
 
-        Debug.Log($"[{GetType().Name}] {ringCollision.gameObject.name}({ballId}) touched Ring.");
+        Debug.Log($"[{GetType().Name}] {ringCollision.gameObject.name} touched Ring.");
 
-        if (_ballShotRegister[ballId] != ShotType.BackboardShot)
-            _ballShotRegister[ballId] = ShotType.RingShot;
+        if (_ballShotRegister[ball] != ShotType.BackboardShot)
+            _ballShotRegister[ball] = ShotType.RingShot;
     }
      
     private void OnBallTouchedBackboard(Collision barkboardCollision)
     {
-        var ballId = barkboardCollision.rigidbody.GetInstanceID();
+        if (!barkboardCollision.gameObject.TryGetComponent<BasketballBall>(out var ball))
+        {
+            Debug.LogError($"[{GetType().Name}] {barkboardCollision.gameObject.name} has no BasketballBall component.", ringCollision.gameObject);
+            return;
+        }
 
-        Debug.Log($"[{GetType().Name}] {barkboardCollision.gameObject.name}({ballId}) touched Backboard.");
+        Debug.Log($"[{GetType().Name}] {barkboardCollision.gameObject.name} touched Backboard.");
 
-        if(_ballShotRegister[ballId] != ShotType.RingShot)
-            _ballShotRegister[ballId] = ShotType.BackboardShot;
+        if(_ballShotRegister[ball] != ShotType.RingShot)
+           _ballShotRegister[ball] = ShotType.BackboardShot;
     }
 
-    private void OnBackboardBonusTriggered(ScoreBonus bonus)
+    private void OnBackboardBonusTriggered(ShotScoreBonus bonus)
     {
         BasketballGameManager.Instance.AddBonus(bonus, bonusTimeWindow);
         StartCoroutine(BonusEventTimeWindowCoroutine(bonus));
@@ -127,7 +139,7 @@ public class BasketballHoop : MonoBehaviour
         onPointScored.RemoveAllListeners();
     }
 
-    private IEnumerator BonusEventTimeWindowCoroutine(ScoreBonus bonus)
+    private IEnumerator BonusEventTimeWindowCoroutine(ShotScoreBonus bonus)
     {
         backboardBonusEventsDispatcher.enabled = false;
         Debug.Log($"[{GetType().Name}] Bonus {bonus.Id} activated!");

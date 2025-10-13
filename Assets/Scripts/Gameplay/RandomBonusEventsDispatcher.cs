@@ -4,14 +4,14 @@ using UnityEngine.Events;
 
 public class RandomBonusEventsDispatcher : MonoBehaviour
 {
-    [SerializeField] private ScoreBonus[] bonuses;
+    [SerializeField] private ShotScoreBonus[] bonuses;
     [SerializeField] private SendEventMode sendEventMode;
 
     // #NOTE: #MattiaCacciatore With a custom inspector/drawer/attribute, this field could be hided based on sendEventMode value.
     [Header("Unity Events")]
-    public UnityEvent<ScoreBonus> onBonusEventTriggered;
+    public UnityEvent<ShotScoreBonus> onBonusEventTriggered;
 
-    public event Action<ScoreBonus> bonusEventTriggered;
+    public event Action<ShotScoreBonus> bonusEventTriggered;
 
     private float _nextEventTimePeriod;
     private float _timeElapsed;
@@ -46,7 +46,7 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
         _totalRate = 0f;
         foreach (var bonus in bonuses)
         {
-            var rate = bonus.rarity.GetFrequencyPerSecond();
+            var rate = bonus.Rarity.GetFrequencyPerSecond();
             if (rate > 0f)
                 _totalRate += rate;
         }
@@ -58,14 +58,14 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
         _nextEventTimePeriod = -Mathf.Log(UnityEngine.Random.value) / _totalRate;
     }
 
-    private ScoreBonus PickBonus()
+    private ShotScoreBonus PickBonus()
     {
         float rate = UnityEngine.Random.value * _totalRate;
         float cumulative = 0f;
 
         foreach (var bonus in bonuses)
         {
-            cumulative += bonus.rarity.GetFrequencyPerSecond();
+            cumulative += bonus.Rarity.GetFrequencyPerSecond();
             if (rate <= cumulative)
                 return bonus;
         }

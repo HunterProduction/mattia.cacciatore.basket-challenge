@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,16 +23,14 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     [Header("Events")]
     public UnityEvent onGameOver;
 
-    private Dictionary<int, BasketballPlayer> _playersIdMap;
-    private Dictionary<int, int> _playerBallScoresMap;
-    private Dictionary<int, int> _ballToPlayerIdsMap;
-    private Dictionary<string, ScoreBonus> _currentActiveBonuses;
+    private Dictionary<BasketballPlayer, int> _playerScoresMap;
+    private Dictionary<string, ShotScoreBonus> _currentActiveBonuses;
 
     private float _gameTimeElapsed;
 
     #region Public Properties
     public GameConfigData GameConfigs => gameConfig;
-    public BasketballPlayer[] Players => _playersIdMap.Values.ToArray();
+    public BasketballPlayer[] Players => _playerScoresMap.Keys.ToArray();
     public float TimeElapsed => _gameTimeElapsed;
     public float TimeRemaining => Mathf.Max(0f, gameConfig.gameDuration - _gameTimeElapsed);
     #endregion
@@ -39,22 +38,17 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     #region Public Methods
     public int GetPlayerScore(BasketballPlayer player)
     {
-        return _playerBallScoresMap[player.Ball.GetInstanceID()];
+        return _playerScoresMap[player];
     }
 
-    public int GetPlayerScore(int playerId)
-    {
-        return _playerBallScoresMap[_playersIdMap[playerId].Ball.GetInstanceID()];
-    }
-
-    public void AddBonus(ScoreBonus bonus, float expiresIn = 0f)
+    public void AddBonus(ShotScoreBonus bonus, float expiresIn = 0f)
     {
         var success = _currentActiveBonuses.TryAdd(bonus.Id, bonus);
         if(success && expiresIn > 0f)
             StartCoroutine(RemoveBonusAfterTimeCoroutine(bonus, expiresIn));
     }
 
-    public void RemoveBonus(ScoreBonus bonus)
+    public void RemoveBonus(ShotScoreBonus bonus)
     {
         _currentActiveBonuses.Remove(bonus.Id);
     }
@@ -74,18 +68,13 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
             court = FindObjectOfType<BasketballCourt>();
         }
 
-        _currentActiveBonuses = new Dictionary<string, ScoreBonus>();
-        _playersIdMap = new Dictionary<int, BasketballPlayer>();
-        _playerBallScoresMap = new Dictionary<int, int>();
-        _ballToPlayerIdsMap = new Dictionary<int, int>();
+        _currentActiveBonuses = new Dictionary<string, ShotScoreBonus>();
+        _playerScoresMap = new Dictionary<BasketballPlayer, int>();
 
         var players = FindObjectsByType<BasketballPlayer>(FindObjectsSortMode.None);
         foreach (var player in players)
         {
-            _playersIdMap.Add(player.GetInstanceID(), player);
-            _playerBallScoresMap.Add(player.Ball.GetInstanceID(), 0);
-            _ballToPlayerIdsMap.Add(player.Ball.GetInstanceID(), player.GetInstanceID());
-
+            _playerScoresMap.Add(player, 0);
             player.onBallShot.AddListener(() => StartCoroutine(ShotTimeoutCoroutine(player)));
         }
 
@@ -98,6 +87,11 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         if(_gameTimeElapsed >= gameConfig.gameDuration)
         {
             Debug.Log($"[{GetType().Name}] Game Over!");
+
+            var scores = _playerScoresMap.Values.ToArray();
+            Array.Sort(scores);
+
+            // #TODO: #MattiaCacciatore Retrieve user's player and determin match result.
 
             onGameOver?.Invoke();
         }
@@ -117,15 +111,15 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         // Apply current active bonuses
         foreach (var bonus in _currentActiveBonuses.Values)
         {
-            bonus.ApplyBonus(ref score);
+            if(bonus.IsAppliedTo(scoredPointArgs.shotType))
+                bonus.ApplyBonus(ref score);
         }
 
         // Update player score
-        _playerBallScoresMap[scoredPointArgs.ballId] += score;
+        _playerScoresMap[scoredPointArgs.player] += score;
 
-        var player = _playersIdMap[_ballToPlayerIdsMap[scoredPointArgs.ballId]];
-        Debug.Log($"[{GetType().Name}] Player {player.name} scored {score} points");
-        StartCoroutine(PointScoredCoroutine(player));
+        Debug.Log($"[{GetType().Name}] Player {scoredPointArgs.player.name} scored {score} points");
+        StartCoroutine(PointScoredCoroutine(scoredPointArgs.player));
     }
 
     private void OnDestroy()
@@ -149,14 +143,13 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
 
     private IEnumerator ShotTimeoutCoroutine(BasketballPlayer player)
     {
-        var ballId = player.Ball.GetInstanceID();
         var timeElapsed = 0f;
-        var initialScore = _playerBallScoresMap[ballId];
+        var initialScore = _playerScoresMap[player];
         var scored = false;
 
         while (!scored && timeElapsed < shootTimeoutTime)
         {
-            if (_playerBallScoresMap[ballId] != initialScore)
+            if (_playerScoresMap[player] != initialScore)
                 scored = true;
             timeElapsed += Time.deltaTime;
             yield return null;
@@ -166,7 +159,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
             player.ResetPlayer(player.transform.position);
     }
 
-    private IEnumerator RemoveBonusAfterTimeCoroutine(ScoreBonus bonus, float expiresIn)
+    private IEnumerator RemoveBonusAfterTimeCoroutine(Bonus bonus, float expiresIn)
     {
         yield return new WaitForSeconds(expiresIn);
         _currentActiveBonuses.Remove(bonus.Id);

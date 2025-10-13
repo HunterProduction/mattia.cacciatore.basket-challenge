@@ -2,22 +2,28 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public struct ScoreBonus
+public class Bonus
 {
-    public enum Type
+    public enum ApplyType
     {
         Additive,
         Multiplicative
     }
 
-    [SerializeField] private string id;
-    public float value;
-    public Type type;
-    public EventRarity rarity;
+    [SerializeField] protected string id;
+    public string Id => id;
 
-    public readonly string Id => id;
+    [SerializeField] protected float value;
+    public float Value => value;
 
-    public ScoreBonus(float bonusValue, Type bonusType, EventRarity rarity, string id = "")
+    [SerializeField] protected ApplyType type;
+    public ApplyType Type => type;
+
+    [SerializeField] protected EventRarity rarity;
+    public EventRarity Rarity => rarity;   
+
+
+    public Bonus(float bonusValue, ApplyType bonusType, EventRarity rarity, string id = "")
     {
         if(string.IsNullOrWhiteSpace(id))
             id = "ScoreBonus_"+Guid.NewGuid().ToString();
@@ -28,14 +34,14 @@ public struct ScoreBonus
         this.rarity = rarity;
     }
 
-    public void ApplyBonus(ref int score)
+    public virtual void ApplyBonus(ref int score)
     {
         switch (type)
         {
-            case Type.Additive:
+            case ApplyType.Additive:
                 score += (int)value;
                 break;
-            case Type.Multiplicative:
+            case ApplyType.Multiplicative:
                 score = (int)(score * value);
                 break;
             default:
