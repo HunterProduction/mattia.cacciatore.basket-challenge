@@ -11,8 +11,8 @@ public enum EventRarity
 public static class EventRarityExtensions
 {
     /**
-     * #NOTE: #MattiaCacciatore These mappings have been hard-coded due to time reasons.
-     * They could easily be updated to a configurable data-driven solution (e.g. using ScriptableObjects).
+     * #NOTE: #MattiaCacciatore This mapping has been hard-coded due to time reasons.
+     * It could easily be updated to a configurable data-driven solution (e.g. using ScriptableObjects).
      */
 
     public static Color GetColor(this EventRarity rarity)
@@ -28,11 +28,13 @@ public static class EventRarityExtensions
 
     public static float GetFrequencyPerSecond(this EventRarity rarity)
     {
+        var config = BasketballGameManager.Instance.GameConfigs;
+
         return rarity switch
         {
-            EventRarity.Common =>   1 / 10f,        // One event every 10 seconds.
-            EventRarity.Uncommon => 1 / 20f,        // One event every 20 seconds.
-            EventRarity.Rare =>     1 / 40f,        // One event every 40 seconds.
+            EventRarity.Common =>   config.commonEventFrequencyPerSecond,
+            EventRarity.Uncommon => config.uncommonEventFrequencyPerSecond,        
+            EventRarity.Rare =>     config.rareEventFrequencyPerSecond,        
             _ => throw new ArgumentOutOfRangeException(),
         };
     }  

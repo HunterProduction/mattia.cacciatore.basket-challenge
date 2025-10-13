@@ -3658,15 +3658,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b924c0413e3eb8d46a4cd1e7a2b9ff5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
+  dontDestroyOnLoad: 0
   hoop: {fileID: 1446801952287803185}
   court: {fileID: 847062868}
   cameraTarget: {fileID: 2119808388}
-  perfectShotScore: 5
-  ringShotScore: 2
-  backboardShotScore: 2
+  gameConfigData: {fileID: 11400000, guid: e14a7e5382bc5a046bb5bf1131aae40e, type: 2}
   shootTimeoutTime: 2.5
   scoreNotificationTime: 1.5
+  onGameOver:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1721439809
 Transform:
   m_ObjectHideFlags: 0
