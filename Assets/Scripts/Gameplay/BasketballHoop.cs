@@ -1,17 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
-public enum ShotType
-{
-    PerfectShot,
-    RingShot,
-    BackboardShot,
-    Miss
-}
 
 public struct ScoredPointArgs
 {
@@ -42,8 +36,13 @@ public class BasketballHoop : MonoBehaviour
     [SerializeField] private TriggerEventDispatcher hoopTrigger;
     [SerializeField] private CollisionEventDispatcher backboardCollision, ringCollision;
 
+    [Header("Score bonus")]
+    [SerializeField] private RandomBonusEventsDispatcher backboardBonusEventsDispatcher;
+    [SerializeField] private float bonusTimeWindow = 6f;
+
     [Header("Events")]
     public UnityEvent<ScoredPointArgs> onPointScored;
+    public UnityEvent<ScoreBonus> onBackboardBonusStarted, onBackboardBonusEnded;
 
     private Dictionary<int, ShotType> _ballShotRegister;
 
@@ -65,7 +64,13 @@ public class BasketballHoop : MonoBehaviour
 
         hoopTrigger.entered += OnBallEntered;
         backboardCollision.entered += OnBallTouchedBackboard;
-        ringCollision.entered += OnBallTouchedRing;        
+        ringCollision.entered += OnBallTouchedRing;
+
+        if (backboardBonusEventsDispatcher == null)
+        {
+            backboardBonusEventsDispatcher = GetComponentInChildren<RandomBonusEventsDispatcher>();
+        }
+        backboardBonusEventsDispatcher.bonusEventTriggered += OnBackboardBonusTriggered;
     }
 
     private void OnBallEntered(Collider ballCollider)
@@ -102,12 +107,37 @@ public class BasketballHoop : MonoBehaviour
             _ballShotRegister[ballId] = ShotType.BackboardShot;
     }
 
+    private void OnBackboardBonusTriggered(ScoreBonus bonus)
+    {
+        BasketballGameManager.Instance.AddBonus(bonus, bonusTimeWindow);
+        StartCoroutine(BonusEventTimeWindowCoroutine(bonus));
+    }
+
     private void OnDisable()
     {
         if (hoopTrigger != null)
-        {
             hoopTrigger.entered -= OnBallEntered;
-        }
+
+        if (backboardBonusEventsDispatcher != null)
+            backboardBonusEventsDispatcher.bonusEventTriggered -= OnBackboardBonusTriggered;
+    }
+
+    private void OnDestroy()
+    {
+        onPointScored.RemoveAllListeners();
+    }
+
+    private IEnumerator BonusEventTimeWindowCoroutine(ScoreBonus bonus)
+    {
+        backboardBonusEventsDispatcher.enabled = false;
+        Debug.Log($"[{GetType().Name}] Bonus {bonus.Id} activated!");
+        onBackboardBonusStarted?.Invoke(bonus);
+
+        yield return new WaitForSeconds(bonusTimeWindow);
+
+        Debug.Log($"[{GetType().Name}] Bonus {bonus.Id} deactivated!");
+        onBackboardBonusEnded?.Invoke(bonus);
+        backboardBonusEventsDispatcher.enabled = true;
     }
 
 #if UNITY_EDITOR

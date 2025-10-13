@@ -2,13 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 public class CameraFollowTarget : MonoBehaviour
-{
-    public enum UpdateMethod
-    {
-        LateUpdate,
-        FixedUpdate
-    }
-
+{ 
     public Transform target;
 
     [Range(0f, 1f)] public float positionSmoothness = 0.1f;
@@ -30,6 +24,13 @@ public class CameraFollowTarget : MonoBehaviour
     {
         if(target != null)
             SnapToTarget();
+    }
+
+    private void Update()
+    {
+        if (updateMethod != UpdateMethod.Update)
+            return;
+        UpdateCameraFollow();
     }
 
     private void FixedUpdate()

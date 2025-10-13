@@ -5,18 +5,12 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Collider))]
 public abstract class BaseCollisionEventDispatcher<TArgument> : MonoBehaviour
 {
-    enum SendEventMode
-    {
-        UnityEvent,
-        CSharpAction,
-        Both
-    }
-
     [SerializeField] protected LayerMask layerMask;
     [SerializeField] private SendEventMode sendEventMode;
     [Range(0f, 3f)]
     [SerializeField] private float sendEventCooldownTime;
 
+    // #NOTE: #MattiaCacciatore With a custom inspector/drawer/attribute, this field could be hided based on sendEventMode value.
     [Header("Unity Events")]
     public UnityEvent<TArgument> onEnter;
     public UnityEvent<TArgument> onStay;

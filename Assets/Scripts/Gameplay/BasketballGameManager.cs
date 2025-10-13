@@ -25,6 +25,8 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     private Dictionary<int, int> _playerBallScoresMap;
     private Dictionary<int, int> _ballToPlayerIdsMap;
 
+    private Dictionary<string, ScoreBonus> _currentActiveBonuses;
+
     public BasketballPlayer[] Players => _playersIdMap.Values.ToArray();
 
     public int GetPlayerScore(BasketballPlayer player)
@@ -35,6 +37,18 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     public int GetPlayerScore(int playerId)
     {
         return _playerBallScoresMap[_playersIdMap[playerId].Ball.GetInstanceID()];
+    }
+
+    public void AddBonus(ScoreBonus bonus, float expiresIn = 0f)
+    {
+        var success = _currentActiveBonuses.TryAdd(bonus.Id, bonus);
+        if(success && expiresIn > 0f)
+            StartCoroutine(RemoveBonusAfterTimeCoroutine(bonus, expiresIn));
+    }
+
+    public void RemoveBonus(ScoreBonus bonus)
+    {
+        _currentActiveBonuses.Remove(bonus.Id);
     }
 
     public override void Awake()
@@ -51,6 +65,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
             court = FindObjectOfType<BasketballCourt>();
         }
 
+        _currentActiveBonuses = new Dictionary<string, ScoreBonus>();
         _playersIdMap = new Dictionary<int, BasketballPlayer>();
         _playerBallScoresMap = new Dictionary<int, int>();
         _ballToPlayerIdsMap = new Dictionary<int, int>();
@@ -70,6 +85,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
 
     private void OnPointScored(ScoredPointArgs scoredPointArgs)
     {
+        // Compute base score value
         var score = scoredPointArgs.shotType switch
         {
             ShotType.PerfectShot => perfectShotScore,
@@ -77,6 +93,14 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
             ShotType.BackboardShot => backboardShotScore,
             _ => 0,
         };
+
+        // Apply current active bonuses
+        foreach (var bonus in _currentActiveBonuses.Values)
+        {
+            bonus.ApplyBonus(ref score);
+        }
+
+        // Update player score
         _playerBallScoresMap[scoredPointArgs.ballId] += score;
 
         var player = _playersIdMap[_ballToPlayerIdsMap[scoredPointArgs.ballId]];
@@ -84,6 +108,13 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         StartCoroutine(PointScoredCoroutine(player));
     }
 
+    private void OnDestroy()
+    {
+        if (hoop != null)
+            hoop.onPointScored.RemoveListener(OnPointScored);
+    }
+
+    #region Coroutines 
     private IEnumerator PointScoredCoroutine(BasketballPlayer player)
     {
         cameraTarget.enabled = false;
@@ -113,9 +144,10 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
             player.ResetPlayer(player.transform.position);
     }
 
-    private void OnDestroy()
+    private IEnumerator RemoveBonusAfterTimeCoroutine(ScoreBonus bonus, float expiresIn)
     {
-        if (hoop != null)
-            hoop.onPointScored.RemoveListener(OnPointScored);
+        yield return new WaitForSeconds(expiresIn);
+        _currentActiveBonuses.Remove(bonus.Id);
     }
+    #endregion
 }
