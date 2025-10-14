@@ -9,7 +9,7 @@ public class GameConfigData : ScriptableObject
     public int backboardShotScore = 2;
 
     [Header("Time")]
-    public float gameDuration = 120f;
+    public int gameDuration = 120;
 
     [Header("Probabilities")]
     public float commonEventFrequencyPerSecond =    1 / 10f;    // One event every 10 seconds.

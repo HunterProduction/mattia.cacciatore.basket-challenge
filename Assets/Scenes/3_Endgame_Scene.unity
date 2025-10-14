@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: fef042c9a6783dc4595f19a746e05b3d, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -97,7 +97,8 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 5393784abf0e18c4a9f5f18f1e516365,
+    type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -630,42 +631,42 @@ PrefabInstance:
     - target: {fileID: 8743762540861094974, guid: 35ddd37ead765654784bc2c53728ff88,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8743762540861094974, guid: 35ddd37ead765654784bc2c53728ff88,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8743762540861094974, guid: 35ddd37ead765654784bc2c53728ff88,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 145
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8743762540861094974, guid: 35ddd37ead765654784bc2c53728ff88,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -89.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9126562240958020168, guid: 35ddd37ead765654784bc2c53728ff88,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9126562240958020168, guid: 35ddd37ead765654784bc2c53728ff88,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9126562240958020168, guid: 35ddd37ead765654784bc2c53728ff88,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 145
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9126562240958020168, guid: 35ddd37ead765654784bc2c53728ff88,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -316.5
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

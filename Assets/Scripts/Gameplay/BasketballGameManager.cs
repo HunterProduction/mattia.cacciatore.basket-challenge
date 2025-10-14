@@ -19,6 +19,8 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     [SerializeField] private GameResultData gameResult;
 
     [Header("Time")]
+    [SerializeField] private UICountdown startupCountdown;
+    [SerializeField] private UICountdown gameCountdown;
     [SerializeField] private int startupCountdownTime = 3;
     [SerializeField] private float shootTimeoutTime = 2.5f;
     [SerializeField] private float scoreNotificationTime = 1.5f;
@@ -38,7 +40,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     public GameConfigData GameConfigs => gameConfig;
     public BasketballPlayer[] Players => _playerScoresMap.Keys.ToArray();
 
-    public int StartupCountdownTime => startupCountdownTime;
     public float TimeElapsed => _gameTimeElapsed;
     public float TimeRemaining => Mathf.Max(0f, gameConfig.gameDuration - _gameTimeElapsed);
     #endregion
@@ -97,20 +98,30 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         hoop.onBallEntered.AddListener(OnPointScored);
 
         gameResult.Initialize(players);
-
+        gameCountdown.CountdownTime = gameConfig.gameDuration;
         if (startupCountdownTime > 0)
-            StartCoroutine(StartupCountdownCoroutine());
+        {
+            input.enabled = false;
+            this.enabled = false;
+            startupCountdown.CountdownTime = startupCountdownTime;
+            startupCountdown.stopped += OnStartupCountdownEnd;
+            startupCountdown.StartCountdown();
+        }
         else
-            onGameStarted?.Invoke();
+        {
+            OnStartupCountdownEnd();
+        }
     }
 
-    private void Update()
+    private void OnStartupCountdownEnd()
     {
-        _gameTimeElapsed += Time.deltaTime;
-        if(_gameTimeElapsed >= gameConfig.gameDuration)
-        {
-            EndGame();
-        }
+        input.enabled = true;
+        this.enabled = true;
+        startupCountdown.stopped -= OnStartupCountdownEnd;
+
+        onGameStarted?.Invoke();
+        gameCountdown.stopped += EndGame;
+        gameCountdown.StartCountdown();
     }
 
     private void OnPointScored(BallEnteredArgs ballEnteredArgs)
@@ -148,6 +159,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         Debug.Log($"[{GetType().Name}] Game Over!");
         input.enabled = false;
         this.enabled = false;
+        gameCountdown.stopped -= EndGame;
         StopAllCoroutines();
 
         BasketballPlayer winner = null;
@@ -182,17 +194,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     }
 
     #region Coroutines 
-    private IEnumerator StartupCountdownCoroutine()
-    {
-        input.enabled = false;
-        this.enabled = false;
-        var wait = new WaitForSeconds(startupCountdownTime);
-        yield return wait;
-        input.enabled = true;
-        this.enabled = true;
-        onGameStarted?.Invoke();
-    }
-
     private IEnumerator PointScoredCoroutine(BasketballPlayer player)
     {
         cameraTarget.enabled = false;

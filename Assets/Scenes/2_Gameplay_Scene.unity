@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: fef042c9a6783dc4595f19a746e05b3d, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 753132377}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -96,8 +96,10 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: ee55b0bc4430fea46ab3a3e66e05866b,
+    type: 2}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 5393784abf0e18c4a9f5f18f1e516365,
+    type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -231,15 +233,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5546393553371721, guid: 6d8f33fb853c9a24c90b2ed4897a164e,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1318309960}
+    - targetCorrespondingSourceObject: {fileID: 5546393553371721, guid: 6d8f33fb853c9a24c90b2ed4897a164e,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1550312890}
     - targetCorrespondingSourceObject: {fileID: 5546393553371721, guid: 6d8f33fb853c9a24c90b2ed4897a164e,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1267975169}
-    - targetCorrespondingSourceObject: {fileID: 5546393553371721, guid: 6d8f33fb853c9a24c90b2ed4897a164e,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1318309960}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8873179293569550324, guid: 6d8f33fb853c9a24c90b2ed4897a164e,
         type: 3}
@@ -374,7 +376,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 322904802}
-  m_LocalRotation: {x: -0.083661616, y: -0.727017, z: 0.67703545, w: 0.077910095}
+  m_LocalRotation: {x: -0.08366168, y: -0.72701687, z: 0.6770356, w: 0.077910125}
   m_LocalPosition: {x: 0, y: 0, z: -0.251}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
@@ -954,8 +956,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 2119808387}
-  positionSmoothness: 0.8
-  rotationSmoothness: 0.8
+  positionSmoothness: 0.65
+  rotationSmoothness: 0.5
   useDamping: 1
   updateMethod: 2
 --- !u!1 &753132376
@@ -1046,13 +1048,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 753132376}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.37775224, y: -0.44218895, z: 0.23047836, w: 0.7801615}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 52.49, y: -57.903, z: 2.404}
 --- !u!114 &753132379
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1130,6 +1132,7 @@ GameObject:
   - component: {fileID: 976918093}
   - component: {fileID: 976918095}
   - component: {fileID: 976918094}
+  - component: {fileID: 976918096}
   m_Layer: 5
   m_Name: Timer Field
   m_TagString: Untagged
@@ -1197,6 +1200,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976918092}
   m_CullTransparentMesh: 1
+--- !u!114 &976918096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976918092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f33d6ab81dba6a64a94dd796557fee3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  countdownTime: 0
+  activateOnStart: 0
+  deactivateOnEnd: 1
+  text: {fileID: 1416914199}
+  format: mm\:ss
 --- !u!1 &1022644412
 GameObject:
   m_ObjectHideFlags: 0
@@ -1634,7 +1654,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f33d6ab81dba6a64a94dd796557fee3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  countdownTime: 0
+  activateOnStart: 0
   deactivateOnEnd: 1
+  text: {fileID: 1318309962}
+  format: ss
 --- !u!114 &1318309962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2532,6 +2556,8 @@ MonoBehaviour:
   input: {fileID: 1083395024}
   gameConfig: {fileID: 11400000, guid: e14a7e5382bc5a046bb5bf1131aae40e, type: 2}
   gameResult: {fileID: 11400000, guid: d0bb0762051b303459eb7350fab07bc7, type: 2}
+  startupCountdown: {fileID: 1318309961}
+  gameCountdown: {fileID: 976918096}
   startupCountdownTime: 3
   shootTimeoutTime: 2.5
   scoreNotificationTime: 1.5
