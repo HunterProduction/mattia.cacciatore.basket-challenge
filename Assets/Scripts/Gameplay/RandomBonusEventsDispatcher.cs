@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class RandomBonusEventsDispatcher : MonoBehaviour
 {
     [SerializeField] private ShotScoreBonus[] bonuses;
+    [SerializeField] private float initialDelay = 3f;
     [SerializeField] private SendEventMode sendEventMode;
 
     // #NOTE: #MattiaCacciatore With a custom inspector/drawer/attribute, this field could be hided based on sendEventMode value.
@@ -23,6 +25,8 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
         ScheduleNext();
 
         _timeElapsed = 0;
+        if (initialDelay > 0f)
+            StartCoroutine(StartupDelayedCoroutine());
     }
 
     private void Update()
@@ -72,6 +76,13 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
 
         // fallback (shouldn't happen due to floating-point rounding)
         return bonuses[^1];
+    }
+
+    private IEnumerator StartupDelayedCoroutine()
+    {
+        this.enabled = false;
+        yield return new WaitForSeconds(initialDelay);
+        this.enabled = true;
     }
 
     private void OnDestroy()

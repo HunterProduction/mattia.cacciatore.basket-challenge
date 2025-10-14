@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(TextMeshProUGUI))]
 public class UIPlayerScoreCounter : MonoBehaviour
 {
-    [SerializeField] private BasketballPlayer player;
+    public BasketballPlayer player;
 
     private TextMeshProUGUI _text;
     private BasketballGameManager _gameManager;

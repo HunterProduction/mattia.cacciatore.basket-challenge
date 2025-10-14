@@ -7,18 +7,6 @@ using System.Collections;
 using UnityEditor;
 #endif
 
-public struct ScoredPointArgs
-{
-    public ShotType shotType;
-    public BasketballPlayer player;
-
-    public ScoredPointArgs(ShotType shotType, BasketballPlayer player)
-    {
-        this.shotType = shotType;
-        this.player = player;
-    }
-}
-
 public class BasketballHoop : MonoBehaviour
 {
     [Header("Transform references")]
@@ -41,7 +29,7 @@ public class BasketballHoop : MonoBehaviour
     [SerializeField] private float bonusTimeWindow = 6f;
 
     [Header("Events")]
-    public UnityEvent<ScoredPointArgs> onPointScored;
+    public UnityEvent<BallEnteredArgs> onBallEntered;
     public UnityEvent<ShotScoreBonus> onBackboardBonusStarted, onBackboardBonusEnded;
 
     private Dictionary<BasketballBall, ShotType> _ballShotRegister;
@@ -86,7 +74,7 @@ public class BasketballHoop : MonoBehaviour
             shotType = ShotType.PerfectShot;
 
         Debug.Log($"[{GetType().Name}] {ballCollider.gameObject.name} {shotType} scored!");
-        onPointScored?.Invoke(new ScoredPointArgs(shotType, ball.Owner));
+        onBallEntered?.Invoke(new BallEnteredArgs(shotType, ball.Owner));
 
         _ballShotRegister[ball] = ShotType.Miss;
     }
@@ -136,7 +124,7 @@ public class BasketballHoop : MonoBehaviour
 
     private void OnDestroy()
     {
-        onPointScored.RemoveAllListeners();
+        onBallEntered.RemoveAllListeners();
     }
 
     private IEnumerator BonusEventTimeWindowCoroutine(ShotScoreBonus bonus)

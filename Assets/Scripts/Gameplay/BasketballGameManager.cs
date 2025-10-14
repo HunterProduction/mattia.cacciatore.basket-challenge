@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +19,15 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     [SerializeField] private GameResultData gameResult;
 
     [Header("Time")]
+    [SerializeField] private int startupCountdownTime = 3;
     [SerializeField] private float shootTimeoutTime = 2.5f;
     [SerializeField] private float scoreNotificationTime = 1.5f;
     [SerializeField] private float endGameNotificationTime = 3f;
 
     [Header("Events")]
-    public UnityEvent onGameOver;
+    public UnityEvent onGameStarted;
+    public UnityEvent<PointScoredArgs> onPointScored;
+    public UnityEvent<MatchResult> onGameOver;
 
     private Dictionary<BasketballPlayer, int> _playerScoresMap;
     private Dictionary<string, ShotScoreBonus> _currentActiveBonuses;
@@ -35,6 +37,8 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     #region Public Properties
     public GameConfigData GameConfigs => gameConfig;
     public BasketballPlayer[] Players => _playerScoresMap.Keys.ToArray();
+
+    public int StartupCountdownTime => startupCountdownTime;
     public float TimeElapsed => _gameTimeElapsed;
     public float TimeRemaining => Mathf.Max(0f, gameConfig.gameDuration - _gameTimeElapsed);
     #endregion
@@ -42,7 +46,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     #region Public Methods
     public int GetPlayerScore(BasketballPlayer player)
     {
-        return _playerScoresMap[player];
+        return (player != null && _playerScoresMap.TryGetValue(player, out var score)) ? score : 0;
     }
 
     public void AddBonus(ShotScoreBonus bonus, float expiresIn = 0f)
@@ -90,9 +94,14 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
             player.onBallShot.AddListener(() => StartCoroutine(ShotTimeoutCoroutine(player)));
         }
 
-        hoop.onPointScored.AddListener(OnPointScored);
+        hoop.onBallEntered.AddListener(OnPointScored);
 
         gameResult.Initialize(players);
+
+        if (startupCountdownTime > 0)
+            StartCoroutine(StartupCountdownCoroutine());
+        else
+            onGameStarted?.Invoke();
     }
 
     private void Update()
@@ -104,10 +113,10 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         }
     }
 
-    private void OnPointScored(ScoredPointArgs scoredPointArgs)
+    private void OnPointScored(BallEnteredArgs ballEnteredArgs)
     {
         // Compute base score value
-        var score = scoredPointArgs.shotType switch
+        var score = ballEnteredArgs.shotType switch
         {
             ShotType.PerfectShot => gameConfig.perfectShotScore,
             ShotType.RingShot => gameConfig.ringShotScore,
@@ -118,18 +127,20 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         // Apply current active bonuses
         foreach (var bonus in _currentActiveBonuses.Values)
         {
-            if(bonus.IsAppliedTo(scoredPointArgs.shotType))
+            if(bonus.IsAppliedTo(ballEnteredArgs.shotType))
                 bonus.ApplyBonus(ref score);
         }
 
-        Debug.Log($"[{GetType().Name}] Player {scoredPointArgs.player.name} scored {score} points");
+        Debug.Log($"[{GetType().Name}] Player {ballEnteredArgs.player.name} scored {score} points");
 
         // Update player score
-        _playerScoresMap[scoredPointArgs.player] += score;
+        _playerScoresMap[ballEnteredArgs.player] += score;
 
         // Update player stats
-        gameResult.GetPlayerStats(scoredPointArgs.player.Id).score = _playerScoresMap[scoredPointArgs.player];
-        StartCoroutine(PointScoredCoroutine(scoredPointArgs.player));
+        gameResult.GetPlayerStats(ballEnteredArgs.player.Id).score = _playerScoresMap[ballEnteredArgs.player];
+
+        onPointScored?.Invoke(new PointScoredArgs(score, ballEnteredArgs));
+        StartCoroutine(PointScoredCoroutine(ballEnteredArgs.player));
     }
 
     private void EndGame()
@@ -152,24 +163,34 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
                 winner = player;
             }
         }
-        if (winner.IsUser)
-            gameResult.matchResult = MatchResult.Win;
+        gameResult.matchResult = winner.IsUser ? MatchResult.Win : MatchResult.Lose;
 
-        // #TODO: #MattiaCacciatore Retrieve user's player and determin match result.
+        // #TODO: #MattiaCacciatore Retrieve user's player and determine match result.
 
-        onGameOver?.Invoke();
+        onGameOver?.Invoke(gameResult.matchResult);
         StartCoroutine(GameOverCoroutine());
     }
 
     private void OnDestroy()
     {
         if (hoop != null)
-            hoop.onPointScored.RemoveListener(OnPointScored);
+            hoop.onBallEntered.RemoveListener(OnPointScored);
 
         onGameOver.RemoveAllListeners();
+        onGameStarted.RemoveAllListeners();
     }
 
     #region Coroutines 
+    private IEnumerator StartupCountdownCoroutine()
+    {
+        input.enabled = false;
+        this.enabled = false;
+        yield return new WaitForSeconds(startupCountdownTime);
+        input.enabled = true;
+        this.enabled = true;
+        onGameStarted?.Invoke();
+    }
+
     private IEnumerator PointScoredCoroutine(BasketballPlayer player)
     {
         cameraTarget.enabled = false;
