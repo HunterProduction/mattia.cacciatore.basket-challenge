@@ -31,6 +31,7 @@ public class BasketballHoop : MonoBehaviour
     [Header("Events")]
     public UnityEvent<BallEnteredArgs> onBallEntered;
     public UnityEvent<ShotScoreBonus> onBackboardBonusStarted, onBackboardBonusEnded;
+    [SerializeField] private float resetBallStateAfter = .5f;
 
     private Dictionary<BasketballBall, ShotType> _ballShotRegister;
 
@@ -70,13 +71,15 @@ public class BasketballHoop : MonoBehaviour
         }
 
         var shotType = _ballShotRegister[ball];
-        if (shotType != ShotType.RingShot && shotType != ShotType.BackboardShot)
+        if (shotType == ShotType.Miss)
             shotType = ShotType.PerfectShot;
 
         Debug.Log($"[{GetType().Name}] {ballCollider.gameObject.name} {shotType} scored!");
         onBallEntered?.Invoke(new BallEnteredArgs(shotType, ball.Owner));
 
-        _ballShotRegister[ball] = ShotType.Miss;
+        // #NOTE: #MattiaCacciatore Not the most elegant solution to reset ball state after scoring in this architecture, but for the scope
+        // of a non-production ready test it should be convenient.
+        StartCoroutine(ResetBallCoroutine(ball));
     }
 
     private void OnBallTouchedRing(Collision ringCollision)
@@ -89,7 +92,7 @@ public class BasketballHoop : MonoBehaviour
 
         Debug.Log($"[{GetType().Name}] {ringCollision.gameObject.name} touched Ring.");
 
-        if (_ballShotRegister[ball] != ShotType.BackboardShot)
+        if (_ballShotRegister[ball] == ShotType.Miss)
             _ballShotRegister[ball] = ShotType.RingShot;
     }
      
@@ -103,7 +106,7 @@ public class BasketballHoop : MonoBehaviour
 
         Debug.Log($"[{GetType().Name}] {barkboardCollision.gameObject.name} touched Backboard.");
 
-        if(_ballShotRegister[ball] != ShotType.RingShot)
+        if(_ballShotRegister[ball] == ShotType.Miss)
            _ballShotRegister[ball] = ShotType.BackboardShot;
     }
 
@@ -111,6 +114,13 @@ public class BasketballHoop : MonoBehaviour
     {
         BasketballGameManager.Instance.AddBonus(bonus, bonusTimeWindow);
         StartCoroutine(BonusEventTimeWindowCoroutine(bonus));
+    }
+
+    private IEnumerator ResetBallCoroutine(BasketballBall ball)
+    {
+        var wait = new WaitForSeconds(resetBallStateAfter);
+        yield return wait;
+        _ballShotRegister[ball] = ShotType.Miss;
     }
 
     private void OnDisable()
@@ -133,7 +143,8 @@ public class BasketballHoop : MonoBehaviour
         Debug.Log($"[{GetType().Name}] Bonus {bonus.Id} activated!");
         onBackboardBonusStarted?.Invoke(bonus);
 
-        yield return new WaitForSeconds(bonusTimeWindow);
+        var wait = new WaitForSeconds(bonusTimeWindow);
+        yield return wait;
 
         Debug.Log($"[{GetType().Name}] Bonus {bonus.Id} deactivated!");
         onBackboardBonusEnded?.Invoke(bonus);

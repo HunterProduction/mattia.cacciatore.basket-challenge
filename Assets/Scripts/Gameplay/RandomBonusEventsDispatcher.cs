@@ -81,7 +81,8 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
     private IEnumerator StartupDelayedCoroutine()
     {
         this.enabled = false;
-        yield return new WaitForSeconds(initialDelay);
+        var wait = new WaitForSeconds(initialDelay);
+        yield return wait;
         this.enabled = true;
     }
 

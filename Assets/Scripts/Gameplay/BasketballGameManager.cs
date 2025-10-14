@@ -185,7 +185,8 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     {
         input.enabled = false;
         this.enabled = false;
-        yield return new WaitForSeconds(startupCountdownTime);
+        var wait = new WaitForSeconds(startupCountdownTime);
+        yield return wait;
         input.enabled = true;
         this.enabled = true;
         onGameStarted?.Invoke();
@@ -195,7 +196,8 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     {
         cameraTarget.enabled = false;
 
-        yield return new WaitForSeconds(scoreNotificationTime);
+        var wait = new WaitForSeconds(scoreNotificationTime);
+        yield return wait;
 
         court.SetPlayerNextPosition(player);
         cameraTarget.enabled = true;
@@ -221,13 +223,15 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
 
     private IEnumerator RemoveBonusAfterTimeCoroutine(Bonus bonus, float expiresIn)
     {
-        yield return new WaitForSeconds(expiresIn);
+        var wait = new WaitForSeconds(expiresIn);
+        yield return wait;
         _currentActiveBonuses.Remove(bonus.Id);
     }
 
     private IEnumerator GameOverCoroutine()
     {
-        yield return new WaitForSeconds(endGameNotificationTime);
+        var wait = new WaitForSeconds(endGameNotificationTime);
+        yield return wait;
         
         endGameSceneLoader.Load();
     }
