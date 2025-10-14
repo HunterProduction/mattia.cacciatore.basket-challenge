@@ -42,6 +42,8 @@ public class BasketballHoop : MonoBehaviour
         {
             _ballShotRegister.Add(player.Ball, ShotType.Miss);
         }
+
+        BasketballGameManager.Instance.onGameOver.AddListener(_ => enabled = false);
     }
 
     private void OnEnable()
@@ -127,6 +129,12 @@ public class BasketballHoop : MonoBehaviour
     {
         if (hoopTrigger != null)
             hoopTrigger.entered -= OnBallEntered;
+
+        if(backboardCollision != null)
+            backboardCollision.entered -= OnBallTouchedBackboard;
+
+        if (ringCollision != null)
+            ringCollision.entered -= OnBallTouchedRing;
 
         if (backboardBonusEventsDispatcher != null)
             backboardBonusEventsDispatcher.bonusEventTriggered -= OnBackboardBonusTriggered;

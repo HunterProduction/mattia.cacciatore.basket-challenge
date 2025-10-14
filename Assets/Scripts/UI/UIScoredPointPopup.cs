@@ -7,6 +7,7 @@ public class UIScoredPointPopup : MonoBehaviour
 
     private TMP_Text _text;
     private float _timer;
+    private BasketballGameManager _gameManager;
 
     private void Awake()
     {
@@ -14,7 +15,8 @@ public class UIScoredPointPopup : MonoBehaviour
     }
     private void Start()
     {
-        BasketballGameManager.Instance.onPointScored.AddListener(Show);
+        _gameManager = BasketballGameManager.Instance;
+        _gameManager.onPointScored.AddListener(Show);
         gameObject.SetActive(false);
     }
 
@@ -37,7 +39,7 @@ public class UIScoredPointPopup : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (BasketballGameManager.Instance != null)
-            BasketballGameManager.Instance.onPointScored?.RemoveListener(Show);
+        if (_gameManager != null)
+            _gameManager.onPointScored?.RemoveListener(Show);
     }
 }

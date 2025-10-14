@@ -1,22 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UIBasketballGameHUD : MonoBehaviour
 {
-    [Header("UI Components")]
+    [Header("UI References")]
     [SerializeField] private UIVelocityProgressBar velocityProgressBar;
     [SerializeField] private UIPlayerScoreCounter scoreCounterPlayer1, scoreCounterPlayer2;
     [SerializeField] private UIEndGamePopup endGamePopup;
 
     private BasketballGameManager _gameManager;
-
-    private void Awake()
-    {
-        velocityProgressBar.gameObject.SetActive(false);
-        endGamePopup.gameObject.SetActive(false);
-    }
 
     private void Start()
     {
@@ -26,17 +17,24 @@ public class UIBasketballGameHUD : MonoBehaviour
         _gameManager.onGameOver.AddListener(OnGameOver);
 
         var players = _gameManager.Players;
-        scoreCounterPlayer1.player = players[0];
+        scoreCounterPlayer1.Player = players[0];
         if(players.Length > 1)
-            scoreCounterPlayer2.player = players[1];
+            scoreCounterPlayer2.Player = players[1];
+
+        velocityProgressBar.gameObject.SetActive(false);
+        endGamePopup.gameObject.SetActive(false);
+        scoreCounterPlayer1.gameObject.SetActive(false);
+        scoreCounterPlayer2.gameObject.SetActive(false);
     }
 
     private void OnGameOver(MatchResult result)
     {
         velocityProgressBar.gameObject.SetActive(false);
+        scoreCounterPlayer1.gameObject.SetActive(false);
+        scoreCounterPlayer2.gameObject.SetActive(false);
 
-        endGamePopup.scoreCounterPlayer1.player = scoreCounterPlayer1.player;
-        endGamePopup.scoreCounterPlayer2.player = scoreCounterPlayer2.player;
+        endGamePopup.scoreCounterPlayer1.Player = scoreCounterPlayer1.Player;
+        endGamePopup.scoreCounterPlayer2.Player = scoreCounterPlayer2.Player;
         endGamePopup.SetResultText(result);
         endGamePopup.gameObject.SetActive(true);
     }
@@ -44,6 +42,8 @@ public class UIBasketballGameHUD : MonoBehaviour
     private void OnGameStarted()
     {
         velocityProgressBar.gameObject.SetActive(true);
+        scoreCounterPlayer1.gameObject.SetActive(true);
+        scoreCounterPlayer2.gameObject.SetActive(true);
     }
 
     private void OnDestroy()

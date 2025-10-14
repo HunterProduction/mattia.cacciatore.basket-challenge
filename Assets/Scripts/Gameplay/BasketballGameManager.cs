@@ -146,9 +146,9 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     private void EndGame()
     {
         Debug.Log($"[{GetType().Name}] Game Over!");
-        StopAllCoroutines();
         input.enabled = false;
         this.enabled = false;
+        StopAllCoroutines();
 
         BasketballPlayer winner = null;
         var maxScore = -Mathf.Infinity;
@@ -176,8 +176,9 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         if (hoop != null)
             hoop.onBallEntered.RemoveListener(OnPointScored);
 
-        onGameOver.RemoveAllListeners();
-        onGameStarted.RemoveAllListeners();
+        onGameOver?.RemoveAllListeners();
+        onGameStarted?.RemoveAllListeners();
+        onPointScored?.RemoveAllListeners();
     }
 
     #region Coroutines 

@@ -26,11 +26,12 @@ public class InputVelocityProvider : MonoBehaviour
 
     public float CurrentValue => Mathf.Sqrt(_inputValue);
 
-
     private void OnEnable()
     {
         pressAction.action.performed += OnPressActionPerformed;
         pressAction.action.canceled += OnPressActionCanceled;
+
+        _inputValue = player.MinShotVelocity.sqrMagnitude;
     }
 
     private void Update()

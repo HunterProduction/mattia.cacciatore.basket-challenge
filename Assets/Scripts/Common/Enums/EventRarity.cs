@@ -14,7 +14,6 @@ public static class EventRarityExtensions
      * #NOTE: #MattiaCacciatore This mapping has been hard-coded due to time reasons.
      * It could easily be updated to a configurable data-driven solution (e.g. using ScriptableObjects).
      */
-
     public static Color GetColor(this EventRarity rarity)
     {
         return rarity switch

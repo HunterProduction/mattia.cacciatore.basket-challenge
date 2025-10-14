@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -33,6 +32,10 @@ public class GameResultData : ScriptableObject
 
     public PlayerStats GetPlayerStats(BasketballPlayer player) => _playerStats[player.Id];
     public PlayerStats GetPlayerStats(string playerId) => _playerStats[playerId];
-
-    public PlayerStats[] GetAllPlayerStats() => _playerStats.Values.ToArray();
+    public PlayerStats[] GetAllPlayerStats(bool sorted = false)
+    {
+        if(sorted)
+            return _playerStats.Values.OrderByDescending(stats => stats.score).ToArray();
+        return _playerStats.Values.ToArray();
+    }
 }

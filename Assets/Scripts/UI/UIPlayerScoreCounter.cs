@@ -1,24 +1,51 @@
+using System;
 using TMPro;
 using UnityEngine;
 
-[RequireComponent(typeof(TextMeshProUGUI))]
 public class UIPlayerScoreCounter : MonoBehaviour
 {
-    public BasketballPlayer player;
+    [SerializeField] private BasketballPlayer player;
 
-    private TextMeshProUGUI _text;
+    [Header("UI References")]
+    [SerializeField] private TextMeshProUGUI playerIdText;
+    [SerializeField] private TextMeshProUGUI scoreText;
+
     private BasketballGameManager _gameManager;
 
-    private void Awake()
+    public BasketballPlayer Player
     {
-        _text = GetComponent<TextMeshProUGUI>();
-
-        // Caching game manager instance to avoid continuous singleton property access and null check.
-        _gameManager = BasketballGameManager.Instance;
+        get => player;
+        set
+        {
+            player = value;
+            if(player != null)
+            {
+                scoreText.text = BasketballGameManager.Instance.GetPlayerScore(player).ToString();
+                if (playerIdText != null)
+                {
+                    playerIdText.text = player.Id;
+                }
+            }            
+        }
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        _text.text = _gameManager.GetPlayerScore(player).ToString();
+        _gameManager = BasketballGameManager.Instance;
+
+        _gameManager.onPointScored.AddListener(UpdateText);
+    }
+
+    private void UpdateText(PointScoredArgs pointScoredArgs)
+    {
+        if(pointScoredArgs.shotData.player != player)
+            return;
+        scoreText.text = _gameManager.GetPlayerScore(player).ToString();
+    }
+
+    private void OnDisable()
+    {
+        if (_gameManager != null)
+            _gameManager.onPointScored?.RemoveListener(UpdateText);
     }
 }
