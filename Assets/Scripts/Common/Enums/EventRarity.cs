@@ -27,7 +27,7 @@ public static class EventRarityExtensions
 
     public static float GetFrequencyPerSecond(this EventRarity rarity)
     {
-        var config = BasketballGameManager.Instance.GameConfigs;
+        var config = BasketballGameManager.Instance.GameConfig;
 
         return rarity switch
         {

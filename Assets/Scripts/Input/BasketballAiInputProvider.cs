@@ -24,16 +24,19 @@ public class BasketballAiInputProvider : BasketballInputProvider
         _aiming = value;
     }
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         player.onPositionReset.AddListener(OnPositionReset);
     }
 
     protected override void OnEnable()
     {
         base.OnEnable();
+        Debug.Log($"[{GetType().Name}] Ai Input enabled");
         SetAiming(true);
     }
+
 
     private void Update()
     {
@@ -73,6 +76,7 @@ public class BasketballAiInputProvider : BasketballInputProvider
 
     private void OnDisable()
     {
+        Debug.Log($"[{GetType().Name}] Ai Input disabled");
         SetAiming(false);
     }
 

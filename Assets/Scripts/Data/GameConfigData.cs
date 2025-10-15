@@ -15,4 +15,8 @@ public class GameConfigData : ScriptableObject
     public float commonEventFrequencyPerSecond =    1 / 10f;    // One event every 10 seconds.
     public float uncommonEventFrequencyPerSecond =  1 / 20f;    // One event every 20 seconds.
     public float rareEventFrequencyPerSecond =      1 / 40f;    // One event every 40 seconds.
+
+    [Header("Bonuses")]
+    public ShotScoreBonus[] backboardBonuses;
+    public PlayerScoreBonus fireballBonus;
 }

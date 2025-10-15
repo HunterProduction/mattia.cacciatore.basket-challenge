@@ -15,10 +15,11 @@ public abstract class BasketballInputProvider : MonoBehaviour
 
     private BasketballGameManager _gameManager;
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
         _gameManager = BasketballGameManager.Instance;
         enabled = false;
+        Debug.Log($"[{GetType().Name}] {gameObject.name} started");
         _gameManager.onGameStarted.AddListener(() => enabled = true);
         _gameManager.onGameOver.AddListener(_ => enabled = false);
     }

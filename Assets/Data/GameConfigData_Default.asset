@@ -19,3 +19,25 @@ MonoBehaviour:
   commonEventFrequencyPerSecond: 0.05
   uncommonEventFrequencyPerSecond: 0.025
   rareEventFrequencyPerSecond: 0.0125
+  backboardBonuses:
+  - id: backboard_bonus_common
+    value: 4
+    type: 0
+    rarity: 0
+    _appliedTo: 3
+  - id: backboard_bonus_uncommon
+    value: 6
+    type: 0
+    rarity: 1
+    _appliedTo: 3
+  - id: backboard_bonus_rare
+    value: 8
+    type: 0
+    rarity: 2
+    _appliedTo: 3
+  fireballBonus:
+    id: 
+    value: 0
+    type: 0
+    rarity: 0
+    player: {fileID: 0}

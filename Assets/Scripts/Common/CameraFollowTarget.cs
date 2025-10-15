@@ -13,6 +13,7 @@ public class CameraFollowTarget : MonoBehaviour
 
     private Vector3 _positionVelocity;
 
+#if UNITY_EDITOR
     private void OnValidate()
     {
         if (target == null)
@@ -20,10 +21,14 @@ public class CameraFollowTarget : MonoBehaviour
 
         SnapToTarget();
     }
+#endif
 
     private void Awake()
     {
-        OnValidate();
+        if (target == null)
+            return;
+
+        SnapToTarget();
     }
 
     private void Update()

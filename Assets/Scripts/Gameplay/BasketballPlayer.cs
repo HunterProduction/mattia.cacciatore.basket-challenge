@@ -80,8 +80,9 @@ public class BasketballPlayer : MonoBehaviour
                 throw new UnassignedReferenceException("Unable to retrieve reference");
             }
         }
+        ball.Owner = this;
 
-        if(court == null)
+        if (court == null)
         {
             court = FindObjectOfType<BasketballCourt>();
             if(court == null)
@@ -89,9 +90,6 @@ public class BasketballPlayer : MonoBehaviour
                 throw new UnassignedReferenceException("Unable to retrieve reference");
             }
         }
-
-        ball.Owner = this;
-        ball.Reset();
 
         // Caching gravity magnitude to spare square root computing
         _gravityMagnitude = Physics.gravity.magnitude;       
@@ -101,6 +99,11 @@ public class BasketballPlayer : MonoBehaviour
             new(0f, Vector3.zero),
             new(1f, Vector3.zero),
         }, Vector3.Lerp);
+    }
+
+    private void Start()
+    {
+        ball.ResetBall();
     }
 
     private void OnEnable()
@@ -155,7 +158,7 @@ public class BasketballPlayer : MonoBehaviour
             Time.timeScale = 1;
 
         transform.position = newShootPosition;
-        ball.Reset();
+        ball.ResetBall();
         inputProvider.enabled = inputEnabled;
         _computeVelocities = true;
         onPositionReset?.Invoke();

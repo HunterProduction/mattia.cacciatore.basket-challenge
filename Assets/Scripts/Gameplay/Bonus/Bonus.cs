@@ -19,11 +19,7 @@ public class Bonus
     [SerializeField] protected ApplyType type;
     public ApplyType Type => type;
 
-    [SerializeField] protected EventRarity rarity;
-    public EventRarity Rarity => rarity;   
-
-
-    public Bonus(float bonusValue, ApplyType bonusType, EventRarity rarity, string id = "")
+    public Bonus(float bonusValue, ApplyType bonusType, string id = "")
     {
         if(string.IsNullOrWhiteSpace(id))
             id = "ScoreBonus_"+Guid.NewGuid().ToString();
@@ -31,7 +27,6 @@ public class Bonus
         this.id = id;
         this.value = bonusValue;
         this.type = bonusType;
-        this.rarity = rarity;
     }
 
     public virtual void ApplyBonus(ref int score)

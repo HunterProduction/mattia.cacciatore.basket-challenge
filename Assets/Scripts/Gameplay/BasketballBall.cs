@@ -32,7 +32,7 @@ public class BasketballBall : MonoBehaviour
         _rigidbody.AddTorque(-transform.right * Random.Range(0, 1f));
     }
 
-    public void Reset()
+    public void ResetBall()
     {
         _rigidbody.isKinematic = true;
         transform.parent = Owner.transform;

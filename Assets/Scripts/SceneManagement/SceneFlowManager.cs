@@ -15,6 +15,8 @@ public class SceneFlowManager : MonoBehaviourSingleton<SceneFlowManager>
 
     private void Start()
     {
+        Application.targetFrameRate = 120;
+
         loadingScreen.gameObject.SetActive(false);
         LoadSceneByNameAsync(firstSceneToLoad);
     }

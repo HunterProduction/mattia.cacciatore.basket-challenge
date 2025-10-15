@@ -2,18 +2,18 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class ShotScoreBonus : Bonus
+public class ShotScoreBonus : RandomBonus
 {
     [SerializeField]
-    private ShotType _appliedTo;
+    private ShotType appliedTo;
 
     public ShotScoreBonus(float bonusValue, ApplyType bonusType, EventRarity rarity, ShotType appliedTo, string id = "") : base(bonusValue, bonusType, rarity, id)
     {
-        this._appliedTo = appliedTo;
+        this.appliedTo = appliedTo;
     }
 
     public bool IsAppliedTo(ShotType shotType)
     {
-        return _appliedTo == shotType;
+        return appliedTo == shotType;
     }
 }

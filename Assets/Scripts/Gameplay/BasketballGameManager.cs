@@ -29,11 +29,10 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     public UnityEvent<GameOverArgs> onGameOver;
 
     private Dictionary<BasketballPlayer, int> _playerScoresMap;
-    private Dictionary<string, ShotScoreBonus> _currentActiveBonuses;
     private BasketballPlayer _userPlayer;
 
     #region Public Properties
-    public GameConfigData GameConfigs => gameConfig;
+    public GameConfigData GameConfig => gameConfig;
     public BasketballPlayer[] Players => _playerScoresMap.Keys.ToArray();
 
     public float TimeElapsed => gameCountdown.CountdownTime - gameCountdown.TimeRemaining;
@@ -46,18 +45,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     public int GetPlayerScore(BasketballPlayer player)
     {
         return (player != null && _playerScoresMap.TryGetValue(player, out var score)) ? score : 0;
-    }
-
-    public void AddBonus(ShotScoreBonus bonus, float expiresIn = 0f)
-    {
-        var success = _currentActiveBonuses.TryAdd(bonus.Id, bonus);
-        if(success && expiresIn > 0f)
-            StartCoroutine(RemoveBonusAfterTimeCoroutine(bonus, expiresIn));
-    }
-
-    public void RemoveBonus(ShotScoreBonus bonus)
-    {
-        _currentActiveBonuses.Remove(bonus.Id);
     }
     #endregion
 
@@ -74,8 +61,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         {
             court = FindObjectOfType<BasketballCourt>();
         }
-        
-        _currentActiveBonuses = new Dictionary<string, ShotScoreBonus>();
+
         _playerScoresMap = new Dictionary<BasketballPlayer, int>();
 
         // Initialize the Players scores dictionary.
@@ -130,11 +116,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         };
 
         // Apply current active bonuses
-        foreach (var bonus in _currentActiveBonuses.Values)
-        {
-            if(bonus.IsAppliedTo(ballEnteredArgs.shotType))
-                bonus.ApplyBonus(ref score);
-        }
+        BasketballBonusManager.Instance.ApplyActiveBonusesTo(ref score, ballEnteredArgs);
 
         Debug.Log($"[{GetType().Name}] Player {ballEnteredArgs.player.name} scored {score} points");
 
@@ -211,13 +193,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
 
         if (!scored)
             player.ResetPlayer(player.transform.position);
-    }
-
-    private IEnumerator RemoveBonusAfterTimeCoroutine(Bonus bonus, float expiresIn)
-    {
-        var wait = new WaitForSeconds(expiresIn);
-        yield return wait;
-        _currentActiveBonuses.Remove(bonus.Id);
     }
 
     private IEnumerator GameOverCoroutine()

@@ -556,6 +556,26 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
+    - target: {fileID: 7451907712519849428, guid: ff92e7778fb7b6a469a17b3c2f5edf9f,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451907712519849428, guid: ff92e7778fb7b6a469a17b3c2f5edf9f,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451907712519849428, guid: ff92e7778fb7b6a469a17b3c2f5edf9f,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451907712519849428, guid: ff92e7778fb7b6a469a17b3c2f5edf9f,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8244718445997096744, guid: ff92e7778fb7b6a469a17b3c2f5edf9f,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -577,7 +597,8 @@ PrefabInstance:
     - {fileID: 2595996209093210835, guid: ff92e7778fb7b6a469a17b3c2f5edf9f, type: 3}
     - {fileID: 7198221545292646692, guid: ff92e7778fb7b6a469a17b3c2f5edf9f, type: 3}
     - {fileID: 7704694150485333923, guid: ff92e7778fb7b6a469a17b3c2f5edf9f, type: 3}
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5845319739538643, guid: ff92e7778fb7b6a469a17b3c2f5edf9f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1725357722022795285, guid: ff92e7778fb7b6a469a17b3c2f5edf9f,

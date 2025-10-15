@@ -5,7 +5,8 @@ using UnityEngine.Events;
 
 public class RandomBonusEventsDispatcher : MonoBehaviour
 {
-    [SerializeField] private ShotScoreBonus[] bonuses;
+    [SerializeField] private GameConfigData gameConfig;
+
     [SerializeField] private float initialDelay = 3f;
     [SerializeField] private SendEventMode sendEventMode;
 
@@ -21,6 +22,8 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
 
     private void Start()
     {
+        if (gameConfig == null)
+            gameConfig = BasketballGameManager.Instance.GameConfig;
         ComputeTotalRate();
         ScheduleNext();
 
@@ -48,7 +51,7 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
     private void ComputeTotalRate()
     {
         _totalRate = 0f;
-        foreach (var bonus in bonuses)
+        foreach (var bonus in gameConfig.backboardBonuses)
         {
             var rate = bonus.Rarity.GetFrequencyPerSecond();
             if (rate > 0f)
@@ -67,7 +70,7 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
         float rate = UnityEngine.Random.value * _totalRate;
         float cumulative = 0f;
 
-        foreach (var bonus in bonuses)
+        foreach (var bonus in gameConfig.backboardBonuses)
         {
             cumulative += bonus.Rarity.GetFrequencyPerSecond();
             if (rate <= cumulative)
@@ -75,7 +78,7 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
         }
 
         // fallback (shouldn't happen due to floating-point rounding)
-        return bonuses[^1];
+        return gameConfig.backboardBonuses[^1];
     }
 
     private IEnumerator StartupDelayedCoroutine()

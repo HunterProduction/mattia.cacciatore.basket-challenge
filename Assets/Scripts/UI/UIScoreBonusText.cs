@@ -31,6 +31,7 @@ public class UIScoreBonusText : MonoBehaviour
         };
 
         _text.text = bonusText;
-        _text.color = bonus.Rarity.GetColor();
+        if(bonus is RandomBonus randomBonus)
+            _text.color = randomBonus.Rarity.GetColor();
     }
 }

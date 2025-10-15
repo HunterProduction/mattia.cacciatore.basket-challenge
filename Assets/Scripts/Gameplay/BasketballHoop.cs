@@ -114,7 +114,7 @@ public class BasketballHoop : MonoBehaviour
 
     private void OnBackboardBonusTriggered(ShotScoreBonus bonus)
     {
-        BasketballGameManager.Instance.AddBonus(bonus, bonusTimeWindow);
+        BasketballBonusManager.Instance.AddBonus(bonus, bonusTimeWindow);
         StartCoroutine(BonusEventTimeWindowCoroutine(bonus));
     }
 
