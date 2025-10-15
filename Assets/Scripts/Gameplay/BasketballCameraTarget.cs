@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 
 public class BasketballCameraTarget : MonoBehaviour
 {
     [Header("Focus")]
+    [SerializeField] private CameraFollowTarget cameraFollow;
     public Transform ballTransform;
 
     [Header("Reference")]
@@ -14,10 +16,22 @@ public class BasketballCameraTarget : MonoBehaviour
     public float lookAtTargetPitchCorrection = 0f;
     [SerializeField] private UpdateMethod updateMethod;
 
-    private void Awake()
+    private BasketballGameManager _gameManager;
+
+    private void Start()
     {
         transform.parent = null;
+
+        if (cameraFollow == null)
+            cameraFollow = Camera.main.GetComponent<CameraFollowTarget>();
+
+        SetCustomCameraTarget(null, true);
         UpdatePositionAndRotation();
+
+        player.onPositionReset.AddListener(() => enabled = true);
+        _gameManager = BasketballGameManager.Instance;
+        _gameManager.onPointScored.AddListener(OnPointScored);
+        _gameManager.onGameOver.AddListener(OnGameOver);
     }
 
     private void Update()
@@ -50,5 +64,32 @@ public class BasketballCameraTarget : MonoBehaviour
 
         var deltaPosition = ballTransform.position - transform.position;
         transform.rotation = Quaternion.LookRotation(deltaPosition, playerTransform.up) * Quaternion.AngleAxis(lookAtTargetPitchCorrection,  Vector3.right);
+    }
+
+    private void OnPointScored(PointScoredArgs args)
+    {
+        if (args.shotData.player == player)
+            enabled = false;
+    }
+
+    private void OnGameOver(GameOverArgs result)
+    {
+        SetCustomCameraTarget(result.winner.EndGameCameraTarget);
+    }
+
+    private void OnDestroy()
+    {
+        if(_gameManager != null)
+        {
+            _gameManager.onPointScored.RemoveListener(OnPointScored);
+        }
+
+        if (player != null)
+            player.onPositionReset.RemoveListener(() => enabled = true);
+    }
+
+    public void SetCustomCameraTarget(Transform targetTransform, bool snap = false)
+    {
+        cameraFollow.SetTarget(targetTransform == null ? transform : targetTransform, snap);
     }
 }

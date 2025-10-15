@@ -4,7 +4,7 @@ using UnityEngine;
 public class UIEndGamePopup : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI resultText;
-    public UIPlayerScoreCounter scoreCounterPlayer1, scoreCounterPlayer2;
+    public UIPlayerScoreCounter[] playerScoreCounters;
 
     public void SetResultText(MatchResult matchResult)
     {

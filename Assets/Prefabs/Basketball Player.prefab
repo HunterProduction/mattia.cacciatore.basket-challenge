@@ -44,12 +44,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f049561346a3f2c478a2eb838f287e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraFollow: {fileID: 0}
   ballTransform: {fileID: 152365932802140451}
   player: {fileID: 3019230651253069509}
   armLength: 3.5
   armPitchCorrection: 20
   lookAtTargetPitchCorrection: -10
   updateMethod: 2
+--- !u!1 &2067879393602727096
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2301761294886510714}
+  m_Layer: 0
+  m_Name: EndGame Camera Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2301761294886510714
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067879393602727096}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.03514609, y: -0.95933384, z: 0.1385186, w: 0.24342558}
+  m_LocalPosition: {x: 1.4525561, y: 2.259966, z: 2.626071}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5095306526909520765}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1093662102373177254
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58,6 +90,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5095306526909520765}
     m_Modifications:
+    - target: {fileID: 132591609101143857, guid: 7a6d9c8977ca43f459b8e57c9b58f7f9,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 467238898904867903, guid: 7a6d9c8977ca43f459b8e57c9b58f7f9,
         type: 3}
       propertyPath: m_Name
@@ -277,7 +314,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1316981293597076, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_Name
-      value: BasketBall_Character
+      value: Basketball Player
       objectReference: {fileID: 0}
     - target: {fileID: 1729100558164152, guid: 2f3e27eecb190e44a9af50723c394274, type: 3}
       propertyPath: m_IsActive
@@ -349,6 +386,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 152365932802140451}
+    - targetCorrespondingSourceObject: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2301761294886510714}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1316981293597076, guid: 2f3e27eecb190e44a9af50723c394274,
         type: 3}
@@ -441,6 +482,7 @@ MonoBehaviour:
   ball: {fileID: 758343530775340651}
   court: {fileID: 0}
   inputProvider: {fileID: 4701333757358738023}
+  endGameCameraTarget: {fileID: 2301761294886510714}
   perfectShotTangentAngle: -55
   backboardShotTangentAngle: -20
   minShotFactor: 0.88
@@ -467,18 +509,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 3019230651253069509}
-  pressAction: {fileID: 8402372055116332552, guid: e5a542b3fd727dd49a0876a598ce2ba1,
-    type: 3}
-  dragAction: {fileID: -5405711690847647916, guid: e5a542b3fd727dd49a0876a598ce2ba1,
-    type: 3}
-  maxTimeFrame: 1
-  accelerationBoost: 1
   onInputStarted:
     m_PersistentCalls:
       m_Calls: []
   onInputPerformed:
     m_PersistentCalls:
       m_Calls: []
+  pressAction: {fileID: 8402372055116332552, guid: e5a542b3fd727dd49a0876a598ce2ba1,
+    type: 3}
+  dragAction: {fileID: -5405711690847647916, guid: e5a542b3fd727dd49a0876a598ce2ba1,
+    type: 3}
+  maxTimeFrame: 1
+  accelerationBoost: 1
 --- !u!4 &5095306526909520765 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274,

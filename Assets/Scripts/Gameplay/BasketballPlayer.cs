@@ -24,6 +24,8 @@ public class BasketballPlayer : MonoBehaviour
 
     [SerializeField] private BasketballCourt court;
     [SerializeField] private BasketballInputProvider inputProvider;
+    [SerializeField] private Transform endGameCameraTarget;
+    public Transform EndGameCameraTarget => endGameCameraTarget;
 
     [Header("Parameters")]
     [Range(-90f, 0f)]
@@ -147,16 +149,16 @@ public class BasketballPlayer : MonoBehaviour
         onBallShot?.Invoke();
     }
 
-    public void ResetPlayer(Vector3 newShootPosition)
+    public void ResetPlayer(Vector3 newShootPosition, bool inputEnabled = true)
     {
         if (debug)
             Time.timeScale = 1;
 
         transform.position = newShootPosition;
         ball.Reset();
-        onPositionReset?.Invoke();
-        inputProvider.enabled = true;
+        inputProvider.enabled = inputEnabled;
         _computeVelocities = true;
+        onPositionReset?.Invoke();
     }
 
     private void UpdateShotOptimalVelocities()

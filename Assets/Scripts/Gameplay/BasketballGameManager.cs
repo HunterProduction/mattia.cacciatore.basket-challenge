@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
 
 public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManager>
 {
     [Header("References")]
     [SerializeField] private BasketballHoop hoop;
     [SerializeField] private BasketballCourt court;
-    [SerializeField] private BasketballCameraTarget cameraTarget;
     [SerializeField] private SceneLoader endGameSceneLoader;
 
     [Header("Game Data")]
@@ -28,22 +26,23 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     [Header("Events")]
     public UnityEvent onGameStarted;
     public UnityEvent<PointScoredArgs> onPointScored;
-    public UnityEvent<MatchResult> onGameOver;
+    public UnityEvent<GameOverArgs> onGameOver;
 
     private Dictionary<BasketballPlayer, int> _playerScoresMap;
     private Dictionary<string, ShotScoreBonus> _currentActiveBonuses;
-
-    private float _gameTimeElapsed;
+    private BasketballPlayer _userPlayer;
 
     #region Public Properties
     public GameConfigData GameConfigs => gameConfig;
     public BasketballPlayer[] Players => _playerScoresMap.Keys.ToArray();
 
-    public float TimeElapsed => _gameTimeElapsed;
-    public float TimeRemaining => Mathf.Max(0f, gameConfig.gameDuration - _gameTimeElapsed);
+    public float TimeElapsed => gameCountdown.CountdownTime - gameCountdown.TimeRemaining;
+    public float TimeRemaining => gameCountdown.TimeRemaining;
     #endregion
 
     #region Public Methods
+    public BasketballPlayer GetUserPlayer() => _userPlayer;
+
     public int GetPlayerScore(BasketballPlayer player)
     {
         return (player != null && _playerScoresMap.TryGetValue(player, out var score)) ? score : 0;
@@ -77,21 +76,24 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         }
         
         _currentActiveBonuses = new Dictionary<string, ShotScoreBonus>();
-        _playerScoresMap = new Dictionary<BasketballPlayer, int>();        
-    }
+        _playerScoresMap = new Dictionary<BasketballPlayer, int>();
 
-    private void Start()
-    {
+        // Initialize the Players scores dictionary.
         var players = FindObjectsByType<BasketballPlayer>(FindObjectsSortMode.None);
         foreach (var player in players)
         {
+            if (player.IsUser)
+                _userPlayer = player;
             _playerScoresMap.Add(player, 0);
             player.onBallShot.AddListener(() => StartCoroutine(ShotTimeoutCoroutine(player)));
         }
 
         hoop.onBallEntered.AddListener(OnPointScored);
-
         gameResult.Initialize(players);
+    }
+
+    private void Start()
+    {
         gameCountdown.CountdownTime = gameConfig.gameDuration;
         if (startupCountdownTime > 0)
         {
@@ -170,7 +172,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
 
         // #TODO: #MattiaCacciatore Retrieve user's player and determine match result.
 
-        onGameOver?.Invoke(gameResult.matchResult);
+        onGameOver?.Invoke(new GameOverArgs(gameResult.matchResult, winner));
         StartCoroutine(GameOverCoroutine());
     }
 
@@ -187,13 +189,10 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     #region Coroutines 
     private IEnumerator PointScoredCoroutine(BasketballPlayer player)
     {
-        cameraTarget.enabled = false;
-
         var wait = new WaitForSeconds(scoreNotificationTime);
         yield return wait;
 
         court.SetPlayerNextPosition(player);
-        cameraTarget.enabled = true;
     }
 
     private IEnumerator ShotTimeoutCoroutine(BasketballPlayer player)

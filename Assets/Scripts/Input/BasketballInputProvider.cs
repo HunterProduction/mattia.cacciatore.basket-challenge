@@ -10,8 +10,8 @@ public abstract class BasketballInputProvider : MonoBehaviour
     public UnityEvent onInputStarted;
     public UnityEvent<float> onInputPerformed;
 
-    protected float _currentValue;
-    public float CurrentValue => Mathf.Sqrt(_currentValue);
+    protected float _currentValueSquared;
+    public float CurrentValue => Mathf.Sqrt(_currentValueSquared);
 
     private BasketballGameManager _gameManager;
 
@@ -25,14 +25,14 @@ public abstract class BasketballInputProvider : MonoBehaviour
 
     protected virtual void OnEnable()
     {
-        _currentValue = player.MinShotVelocity.sqrMagnitude;
+        _currentValueSquared = player.MinShotVelocity.sqrMagnitude;
     }
 
     protected virtual void SendInput()
     {
         onInputPerformed.Invoke(CurrentValue);
 
-        _currentValue = player.MinShotVelocity.sqrMagnitude;
+        _currentValueSquared = player.MinShotVelocity.sqrMagnitude;
     }
 
     protected virtual void OnDestroy()

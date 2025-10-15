@@ -4,7 +4,7 @@ public class UIBasketballGameHUD : MonoBehaviour
 {
     [Header("UI References")]
     [SerializeField] private UIVelocityProgressBar velocityProgressBar;
-    [SerializeField] private UIPlayerScoreCounter scoreCounterPlayer1, scoreCounterPlayer2;
+    [SerializeField] private UIPlayerScoreCounter[] playerScoreCounters;
     [SerializeField] private UIEndGamePopup endGamePopup;
 
     private BasketballGameManager _gameManager;
@@ -16,34 +16,68 @@ public class UIBasketballGameHUD : MonoBehaviour
         _gameManager.onGameStarted.AddListener(OnGameStarted);
         _gameManager.onGameOver.AddListener(OnGameOver);
 
-        var players = _gameManager.Players;
-        scoreCounterPlayer1.Player = players[0];
-        if(players.Length > 1)
-            scoreCounterPlayer2.Player = players[1];
+        InitializeScoreCounters();
 
-        velocityProgressBar.gameObject.SetActive(false);
         endGamePopup.gameObject.SetActive(false);
-        scoreCounterPlayer1.gameObject.SetActive(false);
-        scoreCounterPlayer2.gameObject.SetActive(false);
+        ToggleHUD(false);   
     }
 
-    private void OnGameOver(MatchResult result)
+    private void InitializeScoreCounters()
     {
-        velocityProgressBar.gameObject.SetActive(false);
-        scoreCounterPlayer1.gameObject.SetActive(false);
-        scoreCounterPlayer2.gameObject.SetActive(false);
+        if (playerScoreCounters.Length <= 0)
+            return;
 
-        endGamePopup.scoreCounterPlayer1.Player = scoreCounterPlayer1.Player;
-        endGamePopup.scoreCounterPlayer2.Player = scoreCounterPlayer2.Player;
-        endGamePopup.SetResultText(result);
+        // Set the first score counter to the user player.
+        playerScoreCounters[0].Player = _gameManager.GetUserPlayer();
+
+        var players = _gameManager.Players;
+        if(players.Length != playerScoreCounters.Length)
+        {
+            Debug.LogError($"[{GetType().Name}] Number of players is different than number of score counters", this);
+            return;
+        }
+
+        // Set the rest of the score counters to the non-user players.
+        int i = 1;
+        foreach (var player in players)
+        {
+            if (!player.IsUser)
+            {
+                playerScoreCounters[i].Player = player;
+            }
+        }
+    }
+
+    private void OnGameOver(GameOverArgs result)
+    {
+        ToggleHUD(false);   
+
+        if(endGamePopup.playerScoreCounters.Length != playerScoreCounters.Length)
+        {
+            Debug.LogError($"[{GetType().Name}] Number of score counters is different than number of end game score counters", endGamePopup);
+            return;
+        }
+
+        for(int i = 0; i < playerScoreCounters.Length; i++)
+        {
+            endGamePopup.playerScoreCounters[i].Player = playerScoreCounters[i].Player;
+        }
+        endGamePopup.SetResultText(result.matchResult);
         endGamePopup.gameObject.SetActive(true);
     }
 
     private void OnGameStarted()
     {
-        velocityProgressBar.gameObject.SetActive(true);
-        scoreCounterPlayer1.gameObject.SetActive(true);
-        scoreCounterPlayer2.gameObject.SetActive(true);
+        ToggleHUD(true);
+    }
+
+    private void ToggleHUD(bool enabled)
+    {
+        velocityProgressBar.gameObject.SetActive(enabled);
+        foreach (var scoreCounter in playerScoreCounters)
+        {
+            scoreCounter.gameObject.SetActive(enabled);
+        }
     }
 
     private void OnDestroy()

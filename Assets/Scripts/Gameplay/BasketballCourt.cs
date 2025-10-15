@@ -23,30 +23,29 @@ public class BasketballCourt : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool debug;
 
-    private Dictionary<int, int> _playersCurrentPositionMap;
+    private Dictionary<BasketballPlayer, int> _playersCurrentPositionMap;
 
     private void Start()
     {
-        _playersCurrentPositionMap = new Dictionary<int, int>();
+        _playersCurrentPositionMap = new Dictionary<BasketballPlayer, int>();
 
         foreach(var player in BasketballGameManager.Instance.Players)
         {
-            _playersCurrentPositionMap.Add(player.GetInstanceID(), 0);
-            player.ResetPlayer(shootPositions[0].position);
+            _playersCurrentPositionMap.Add(player, -1);
+            SetPlayerNextPosition(player, false);
         }
     }
 
-    public void SetPlayerNextPosition(BasketballPlayer player)
+    public void SetPlayerNextPosition(BasketballPlayer player, bool inputEnabled = true)
     {
-        var playerId = player.GetInstanceID();
-        var nextPosIndex = _playersCurrentPositionMap[playerId];
+        var nextPosIndex = _playersCurrentPositionMap[player];
 
         // Find the next free shoot position.
         do nextPosIndex = (nextPosIndex + 1) % shootPositions.Length;
         while (_playersCurrentPositionMap.ContainsValue(nextPosIndex));
 
-        player.ResetPlayer(shootPositions[nextPosIndex].position);
-        _playersCurrentPositionMap[playerId] = nextPosIndex;
+        player.ResetPlayer(shootPositions[nextPosIndex].position, inputEnabled);
+        _playersCurrentPositionMap[player] = nextPosIndex;
     }
 
     public Vector3 GetHoopTarget(Vector3 playerPosition, BasketballPlayer.ShotAimMode shotType)

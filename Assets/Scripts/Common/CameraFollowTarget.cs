@@ -1,9 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 public class CameraFollowTarget : MonoBehaviour
 { 
-    public Transform target;
+    [SerializeField] private Transform target;
 
     [Range(0f, 1f)] public float positionSmoothness = 0.1f;
     [Range(0f, 1f)] public float rotationSmoothness = 0.1f;
@@ -22,8 +23,7 @@ public class CameraFollowTarget : MonoBehaviour
 
     private void Awake()
     {
-        if(target != null)
-            SnapToTarget();
+        OnValidate();
     }
 
     private void Update()
@@ -79,15 +79,16 @@ public class CameraFollowTarget : MonoBehaviour
         }
     }
 
-    public void SetTarget(Transform newTarget)
+    public void SetTarget(Transform newTarget, bool snap = false)
     {
         target = newTarget;
+        if(snap) SnapToTarget();
     }
 
     public void SnapToTarget()
     {
         if (target == null) return;
-        transform.SetPositionAndRotation(target.position, target.rotation);
         _positionVelocity = Vector3.zero;
+        transform.SetPositionAndRotation(target.position, target.rotation);
     }
 }

@@ -44,7 +44,7 @@ public class BasketballPlayerInputProvider : BasketballInputProvider
         var gain = 1f + accelerationBoost * (1f - Mathf.Exp(-deltaY / Time.deltaTime));
 
         var deltaInput = deltaY * (max - min) * gain;
-        _currentValue = Mathf.Clamp(_currentValue + deltaInput, min, max);
+        _currentValueSquared = Mathf.Clamp(_currentValueSquared + deltaInput, min, max);
 
         _timeElapsed += Time.deltaTime;
         if(_timeElapsed > maxTimeFrame)
@@ -54,7 +54,7 @@ public class BasketballPlayerInputProvider : BasketballInputProvider
     private void OnPressActionPerformed(InputAction.CallbackContext context)
     {
         _timeElapsed = 0f;
-        _currentValue = player.MinShotVelocity.sqrMagnitude;
+        _currentValueSquared = player.MinShotVelocity.sqrMagnitude;
 
         _pressed = true;
         onInputStarted.Invoke();
