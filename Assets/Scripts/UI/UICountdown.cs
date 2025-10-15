@@ -26,6 +26,8 @@ public class UICountdown : MonoBehaviour
     public event Action started, paused, stopped;
 
     private float _timeRemaining;
+    public int TimeRemaining => Mathf.CeilToInt(_timeRemaining);
+
     private bool _running;
 
     private void Start()
@@ -72,7 +74,7 @@ public class UICountdown : MonoBehaviour
         /** 
          * #NOTE: #MattiaCacciatore Not the best to allocate a TimeSpan every frame, but it's convenient for string formatting
          */
-        text.text = TimeSpan.FromSeconds(_timeRemaining).ToString(format);
+        text.text = TimeSpan.FromSeconds(TimeRemaining).ToString(format);
 
         if (_timeRemaining > 0)
         {

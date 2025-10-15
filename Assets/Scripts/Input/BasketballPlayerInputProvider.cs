@@ -1,12 +1,8 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-// #TODO: Rethink class naming.
-public class InputVelocityProvider : MonoBehaviour
+public class BasketballPlayerInputProvider : BasketballInputProvider
 {
-    [SerializeField] private BasketballPlayer player;
-
     [Header("Input Actions")]
     [SerializeField] private InputActionReference pressAction;
     [SerializeField] private InputActionReference dragAction;
@@ -16,22 +12,14 @@ public class InputVelocityProvider : MonoBehaviour
     [Range(0f, 2f)]
     [SerializeField] private float accelerationBoost = 0.2f;
 
-    [Header("Events")]
-    public UnityEvent onInputStarted;
-    public UnityEvent<float> onInputPerformed;
-
-    private float _inputValue;
     private float _timeElapsed;
     private bool _pressed;
 
-    public float CurrentValue => Mathf.Sqrt(_inputValue);
-
-    private void OnEnable()
+    protected override void OnEnable()
     {
+        base.OnEnable();
         pressAction.action.performed += OnPressActionPerformed;
         pressAction.action.canceled += OnPressActionCanceled;
-
-        _inputValue = player.MinShotVelocity.sqrMagnitude;
     }
 
     private void Update()
@@ -56,7 +44,7 @@ public class InputVelocityProvider : MonoBehaviour
         var gain = 1f + accelerationBoost * (1f - Mathf.Exp(-deltaY / Time.deltaTime));
 
         var deltaInput = deltaY * (max - min) * gain;
-        _inputValue = Mathf.Clamp(_inputValue + deltaInput, min, max);
+        _currentValue = Mathf.Clamp(_currentValue + deltaInput, min, max);
 
         _timeElapsed += Time.deltaTime;
         if(_timeElapsed > maxTimeFrame)
@@ -66,7 +54,7 @@ public class InputVelocityProvider : MonoBehaviour
     private void OnPressActionPerformed(InputAction.CallbackContext context)
     {
         _timeElapsed = 0f;
-        _inputValue = player.MinShotVelocity.sqrMagnitude;
+        _currentValue = player.MinShotVelocity.sqrMagnitude;
 
         _pressed = true;
         onInputStarted.Invoke();
@@ -80,11 +68,9 @@ public class InputVelocityProvider : MonoBehaviour
         }
     }
 
-    private void SendInput()
+    protected override void SendInput()
     {
-        onInputPerformed.Invoke(CurrentValue);
-
-        _inputValue = player.MinShotVelocity.sqrMagnitude;
+        base.SendInput();
         _pressed = false;
     }
 
@@ -92,11 +78,5 @@ public class InputVelocityProvider : MonoBehaviour
     {
         pressAction.action.performed -= OnPressActionPerformed;
         pressAction.action.canceled -= OnPressActionCanceled;
-    }
-
-    private void OnDestroy()
-    {
-        onInputPerformed.RemoveAllListeners();
-        onInputStarted.RemoveAllListeners();
     }
 }

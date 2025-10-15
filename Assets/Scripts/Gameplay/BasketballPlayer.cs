@@ -23,7 +23,7 @@ public class BasketballPlayer : MonoBehaviour
     public BasketballBall Ball => ball;
 
     [SerializeField] private BasketballCourt court;
-    [SerializeField] private InputVelocityProvider inputProvider;
+    [SerializeField] private BasketballInputProvider inputProvider;
 
     [Header("Parameters")]
     [Range(-90f, 0f)]

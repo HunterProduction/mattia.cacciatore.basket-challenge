@@ -12,7 +12,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     [SerializeField] private BasketballCourt court;
     [SerializeField] private BasketballCameraTarget cameraTarget;
     [SerializeField] private SceneLoader endGameSceneLoader;
-    [SerializeField] private PlayerInput input;
 
     [Header("Game Data")]
     [SerializeField] private GameConfigData gameConfig;
@@ -76,11 +75,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         {
             court = FindObjectOfType<BasketballCourt>();
         }
-
-        if (input == null)
-        {
-            input = FindObjectOfType<PlayerInput>();
-        }
         
         _currentActiveBonuses = new Dictionary<string, ShotScoreBonus>();
         _playerScoresMap = new Dictionary<BasketballPlayer, int>();        
@@ -101,7 +95,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         gameCountdown.CountdownTime = gameConfig.gameDuration;
         if (startupCountdownTime > 0)
         {
-            input.enabled = false;
             this.enabled = false;
             startupCountdown.CountdownTime = startupCountdownTime;
             startupCountdown.stopped += OnStartupCountdownEnd;
@@ -115,7 +108,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
 
     private void OnStartupCountdownEnd()
     {
-        input.enabled = true;
         this.enabled = true;
         startupCountdown.stopped -= OnStartupCountdownEnd;
 
@@ -157,7 +149,6 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     private void EndGame()
     {
         Debug.Log($"[{GetType().Name}] Game Over!");
-        input.enabled = false;
         this.enabled = false;
         gameCountdown.stopped -= EndGame;
         StopAllCoroutines();
