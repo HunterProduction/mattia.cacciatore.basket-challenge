@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
+using System;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -26,7 +28,6 @@ public class BasketballHoop : MonoBehaviour
 
     [Header("Score bonus")]
     [SerializeField] private RandomBonusEventsDispatcher backboardBonusEventsDispatcher;
-    [SerializeField] private float bonusTimeWindow = 6f;
 
     [Header("Events")]
     public UnityEvent<BallEnteredArgs> onBallEntered;
@@ -34,6 +35,7 @@ public class BasketballHoop : MonoBehaviour
     [SerializeField] private float resetBallStateAfter = .5f;
 
     private Dictionary<BasketballBall, ShotType> _ballShotRegister;
+    private ShotScoreBonus _currentActiveBonus;
 
     private void Start()
     {
@@ -114,8 +116,28 @@ public class BasketballHoop : MonoBehaviour
 
     private void OnBackboardBonusTriggered(ShotScoreBonus bonus)
     {
-        BasketballBonusManager.Instance.AddBonus(bonus, bonusTimeWindow);
-        StartCoroutine(BonusEventTimeWindowCoroutine(bonus));
+        _currentActiveBonus = bonus;
+
+        var bonusManager = BasketballBonusManager.Instance;
+        bonusManager.AddBonus(_currentActiveBonus);
+
+        Debug.Log($"[{GetType().Name}] Bonus {_currentActiveBonus.Id} activated!");
+        onBackboardBonusStarted?.Invoke(_currentActiveBonus);
+
+        backboardBonusEventsDispatcher.enabled = false;
+        bonusManager.bonusRemoved += OnBonusExpired;
+    }
+
+    private void OnBonusExpired(string bonusId)
+    {
+        if (bonusId != _currentActiveBonus.Id)
+            return;
+
+        Debug.Log($"[{GetType().Name}] Bonus {_currentActiveBonus.Id} deactivated!");
+        onBackboardBonusEnded?.Invoke(_currentActiveBonus);
+        BasketballBonusManager.Instance.bonusRemoved -= OnBonusExpired;
+        _currentActiveBonus = null;
+        backboardBonusEventsDispatcher.enabled = true;
     }
 
     private IEnumerator ResetBallCoroutine(BasketballBall ball)
@@ -143,20 +165,6 @@ public class BasketballHoop : MonoBehaviour
     private void OnDestroy()
     {
         onBallEntered.RemoveAllListeners();
-    }
-
-    private IEnumerator BonusEventTimeWindowCoroutine(ShotScoreBonus bonus)
-    {
-        backboardBonusEventsDispatcher.enabled = false;
-        Debug.Log($"[{GetType().Name}] Bonus {bonus.Id} activated!");
-        onBackboardBonusStarted?.Invoke(bonus);
-
-        var wait = new WaitForSeconds(bonusTimeWindow);
-        yield return wait;
-
-        Debug.Log($"[{GetType().Name}] Bonus {bonus.Id} deactivated!");
-        onBackboardBonusEnded?.Invoke(bonus);
-        backboardBonusEventsDispatcher.enabled = true;
     }
 
 #if UNITY_EDITOR

@@ -1,14 +1,13 @@
 using System;
-using UnityEngine;
 
 [Serializable]
 public class PlayerScoreBonus : Bonus
 {
-    [SerializeField] private BasketballPlayer player;
-    public BasketballPlayer Player => player;
+    private BasketballPlayer _player;
+    public BasketballPlayer Player => _player;
 
-    public PlayerScoreBonus(BasketballPlayer player, float bonusValue, ApplyType bonusType, EventRarity rarity, string id = "") : base(bonusValue, bonusType, id)
+    public PlayerScoreBonus(BasketballPlayer player, float bonusValue, ApplyType bonusType, int expiresIn, string id = "") : base(bonusValue, bonusType, expiresIn, id)
     {
-        this.player = player;
+        this._player = player;
     }
 }

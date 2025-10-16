@@ -648,7 +648,6 @@ MonoBehaviour:
   backboardCollision: {fileID: 3886566994054492638}
   ringCollision: {fileID: 219698766809470304}
   backboardBonusEventsDispatcher: {fileID: 703355335672064766}
-  bonusTimeWindow: 6
   onBallEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -952,7 +951,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   sendEventMode: 1
-  sendEventCooldownTime: 1
+  sendEventCooldownTime: 0.3
   onEnter:
     m_PersistentCalls:
       m_Calls: []

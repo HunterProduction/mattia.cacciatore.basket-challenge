@@ -19,4 +19,5 @@ public class GameConfigData : ScriptableObject
     [Header("Bonuses")]
     public ShotScoreBonus[] backboardBonuses;
     public PlayerScoreBonus fireballBonus;
+    public int fireballBonusStreakThreshold = 5;
 }

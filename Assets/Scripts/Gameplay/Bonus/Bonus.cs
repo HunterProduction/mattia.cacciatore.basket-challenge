@@ -19,14 +19,19 @@ public class Bonus
     [SerializeField] protected ApplyType type;
     public ApplyType Type => type;
 
-    public Bonus(float bonusValue, ApplyType bonusType, string id = "")
-    {
-        if(string.IsNullOrWhiteSpace(id))
-            id = "ScoreBonus_"+Guid.NewGuid().ToString();
+    [Tooltip("Time in seconds. If 0, bonus does not expire with time.")]
+    [SerializeField] protected int expiresIn;
+    public float ExpiresIn => expiresIn;
 
-        this.id = id;
+    public Bonus(float bonusValue, ApplyType bonusType, int expiresIn, string id = "")
+    {
+        this.id = string.IsNullOrWhiteSpace(id) ?
+            $"Bonus_{Guid.NewGuid()}" :
+            $"{id}_{Guid.NewGuid()}";
+
         this.value = bonusValue;
         this.type = bonusType;
+        this.expiresIn = expiresIn;
     }
 
     public virtual void ApplyBonus(ref int score)
