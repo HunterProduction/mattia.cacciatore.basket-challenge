@@ -1,4 +1,4 @@
-﻿enum SendEventMode
+﻿public enum SendEventMode
 {
     UnityEvent,
     CSharpAction,

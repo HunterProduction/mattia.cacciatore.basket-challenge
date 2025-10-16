@@ -7,6 +7,7 @@ public abstract class BaseCollisionEventDispatcher<TArgument> : MonoBehaviour
 {
     [SerializeField] protected LayerMask layerMask;
     [SerializeField] private SendEventMode sendEventMode;
+    public SendEventMode SendEventMode => sendEventMode;
     [Range(0f, 3f)]
     [SerializeField] private float sendEventCooldownTime;
 

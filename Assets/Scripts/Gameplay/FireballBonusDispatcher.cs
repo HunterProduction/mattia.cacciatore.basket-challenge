@@ -23,7 +23,7 @@ public class FireballBonusDispatcher : MonoBehaviour
     {
         if(player == null)
         {
-            Debug.LogError($"{GetType().Name} No player assigned to bonus.");
+            Debug.LogError($"{GetType().Name} No player assigned to bonus.", this);
             return;
         }
 

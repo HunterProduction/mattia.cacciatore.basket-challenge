@@ -9,6 +9,7 @@ public class RandomBonusEventsDispatcher : MonoBehaviour
 
     [SerializeField] private float initialDelay = 3f;
     [SerializeField] private SendEventMode sendEventMode;
+    public SendEventMode SendEventMode => sendEventMode;
 
     // #NOTE: #MattiaCacciatore With a custom inspector/drawer/attribute, this field could be hided based on sendEventMode value.
     [Header("Unity Events")]

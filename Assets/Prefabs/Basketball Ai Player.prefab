@@ -46,22 +46,22 @@ PrefabInstance:
     - target: {fileID: 5095306526909520765, guid: 8643e20733b680c48b98378b98ac9546,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.97622263
       objectReference: {fileID: 0}
     - target: {fileID: 5095306526909520765, guid: 8643e20733b680c48b98378b98ac9546,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.000032598353
       objectReference: {fileID: 0}
     - target: {fileID: 5095306526909520765, guid: 8643e20733b680c48b98378b98ac9546,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.21677041
       objectReference: {fileID: 0}
     - target: {fileID: 5095306526909520765, guid: 8643e20733b680c48b98378b98ac9546,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0.000000045431083
       objectReference: {fileID: 0}
     - target: {fileID: 5095306526909520765, guid: 8643e20733b680c48b98378b98ac9546,
         type: 3}
@@ -89,6 +89,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 318899802560119556, guid: 8643e20733b680c48b98378b98ac9546, type: 3}
     - {fileID: 8424431992535224210, guid: 8643e20733b680c48b98378b98ac9546, type: 3}
+    - {fileID: 3145752098782100149, guid: 8643e20733b680c48b98378b98ac9546, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5089843478552057257, guid: 8643e20733b680c48b98378b98ac9546,
@@ -121,7 +122,7 @@ MonoBehaviour:
   onInputPerformed:
     m_PersistentCalls:
       m_Calls: []
-  aiData: {fileID: 11400000, guid: 1d1bf50c4bac0204abf5f431736dac9e, type: 2}
+  aiData: {fileID: 11400000, guid: c107d257a33d0c843868236fe35b4e10, type: 2}
 --- !u!114 &5542798577884332909 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3019230651253069509, guid: 8643e20733b680c48b98378b98ac9546,
