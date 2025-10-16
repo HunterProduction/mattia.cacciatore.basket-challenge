@@ -25,7 +25,10 @@ public class BasketballPlayerInputProvider : BasketballInputProvider
     private void Update()
     {
         if (!_pressed)
+        {
+            _currentValueSquared = player.MinShotVelocity.sqrMagnitude;
             return;
+        }            
 
         /*
          *  #NOTE: Where it's mathematically possible, magnitudes are kept squared to avoid
