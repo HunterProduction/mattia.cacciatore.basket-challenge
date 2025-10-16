@@ -69,16 +69,20 @@ public class BasketballBonusManager : MonoBehaviourSingleton<BasketballBonusMana
     #region RemoveBonus overloads
     public void RemoveBonus(ShotScoreBonus bonus)
     {
-        Debug.Log($"[{GetType().Name}] Removed bonus {bonus.Id} of type {bonus.GetType().Name}");
-        bonusRemoved?.Invoke(bonus.Id);
-        _currentActiveShotBonuses.Remove(bonus.Id);
+        if (_currentActiveShotBonuses.Remove(bonus.Id))
+        {
+            Debug.Log($"[{GetType().Name}] Removed bonus {bonus.Id} of type {bonus.GetType().Name}");
+            bonusRemoved?.Invoke(bonus.Id);
+        }
     }
 
     public void RemoveBonus(PlayerScoreBonus bonus)
     {
-        Debug.Log($"[{GetType().Name}] Removed bonus {bonus.Id} of type {bonus.GetType().Name}");
-        bonusRemoved?.Invoke(bonus.Id);
-        _currentActivePlayerBonuses[bonus.Player].Remove(bonus.Id);
+        if (_currentActivePlayerBonuses[bonus.Player].Remove(bonus.Id))
+        {
+            Debug.Log($"[{GetType().Name}] Removed bonus {bonus.Id} of type {bonus.GetType().Name}");
+            bonusRemoved?.Invoke(bonus.Id);
+        }
     }
     #endregion
 

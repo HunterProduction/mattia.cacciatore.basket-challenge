@@ -541,7 +541,7 @@ GameObject:
   - component: {fileID: 2376535742780894600}
   - component: {fileID: 4895373908571486666}
   - component: {fileID: 8550577526406116997}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Basketball Court
   m_TagString: Untagged
   m_Icon: {fileID: 0}

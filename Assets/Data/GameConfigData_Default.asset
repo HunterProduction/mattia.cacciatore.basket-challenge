@@ -15,7 +15,7 @@ MonoBehaviour:
   perfectShotScore: 5
   ringShotScore: 2
   backboardShotScore: 2
-  gameDuration: 20
+  gameDuration: 60
   commonEventFrequencyPerSecond: 0.05
   uncommonEventFrequencyPerSecond: 0.025
   rareEventFrequencyPerSecond: 0.0125
@@ -43,4 +43,4 @@ MonoBehaviour:
     value: 2
     type: 1
     expiresIn: 10
-    player: {fileID: 0}
+  fireballBonusStreakThreshold: 5

@@ -6,6 +6,7 @@ public class UIBasketballGameHUD : MonoBehaviour
     [SerializeField] private UIVelocityProgressBar velocityProgressBar;
     [SerializeField] private UIPlayerScoreCounter[] playerScoreCounters;
     [SerializeField] private UIEndGamePopup endGamePopup;
+    [SerializeField] private UIFireballProgressBar fireballProgressBar;
 
     private BasketballGameManager _gameManager;
 
@@ -74,6 +75,7 @@ public class UIBasketballGameHUD : MonoBehaviour
     private void ToggleHUD(bool enabled)
     {
         velocityProgressBar.gameObject.SetActive(enabled);
+        fireballProgressBar.gameObject.SetActive(enabled);
         foreach (var scoreCounter in playerScoreCounters)
         {
             scoreCounter.gameObject.SetActive(enabled);

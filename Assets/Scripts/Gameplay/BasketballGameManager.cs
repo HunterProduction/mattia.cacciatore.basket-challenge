@@ -27,6 +27,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
     public UnityEvent onGameStarted;
     public UnityEvent<PointScoredArgs> onPointScored;
     public UnityEvent<GameOverArgs> onGameOver;
+    public UnityEvent<BasketballPlayer> onShotMiss;
 
     private Dictionary<BasketballPlayer, int> _playerScoresMap;
     private BasketballPlayer _userPlayer;
@@ -166,6 +167,7 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         onGameOver?.RemoveAllListeners();
         onGameStarted?.RemoveAllListeners();
         onPointScored?.RemoveAllListeners();
+        onShotMiss?.RemoveAllListeners();
     }
 
     #region Coroutines 
@@ -192,7 +194,10 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         }
 
         if (!scored)
+        {
+            onShotMiss?.Invoke(player);
             player.ResetPlayer(player.transform.position);
+        }
     }
 
     private IEnumerator GameOverCoroutine()

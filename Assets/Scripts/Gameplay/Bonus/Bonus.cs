@@ -21,7 +21,7 @@ public class Bonus
 
     [Tooltip("Time in seconds. If 0, bonus does not expire with time.")]
     [SerializeField] protected int expiresIn;
-    public float ExpiresIn => expiresIn;
+    public int ExpiresIn => expiresIn;
 
     public Bonus(float bonusValue, ApplyType bonusType, int expiresIn, string id = "")
     {
