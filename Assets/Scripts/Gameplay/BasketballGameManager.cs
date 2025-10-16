@@ -138,22 +138,47 @@ public class BasketballGameManager : MonoBehaviourSingleton<BasketballGameManage
         gameCountdown.stopped -= EndGame;
         StopAllCoroutines();
 
-        BasketballPlayer winner = null;
-        var maxScore = -Mathf.Infinity;
+        var result = MatchResult.Lose;
+
+        // Determine best score
+        float maxScore = float.NegativeInfinity;
+        foreach (var score in _playerScoresMap.Values)
+            if (score > maxScore)
+                maxScore = score;
+
+        // Collect all players with that best score 
+        var topPlayers = new List<BasketballPlayer>();
+        BasketballPlayer user = null;
         foreach (var pair in _playerScoresMap)
         {
             var player = pair.Key;
             player.enabled = false;
 
-            if (pair.Value > maxScore)
+            if (Mathf.Approximately(pair.Value, maxScore))
             {
-                maxScore = pair.Value;
-                winner = player;
+                topPlayers.Add(player);
+                // If User has the best score, declare win
+                if (player.IsUser)
+                {
+                    user = player;
+                    result = MatchResult.Win;
+                }
             }
         }
-        gameResult.matchResult = winner.IsUser ? MatchResult.Win : MatchResult.Lose;
 
-        // #TODO: #MattiaCacciatore Retrieve user's player and determine match result.
+        // But if the user is not the only one with the best score, declare a draw
+        if (result == MatchResult.Win && topPlayers.Count > 1)
+        {
+            result = MatchResult.Draw;
+        }
+
+        gameResult.matchResult = result;
+
+        /** 
+         * #NOTE: #MattiaCacciatore In case of draw, pick the user anyway as a winner reference. In this architecture this has no influence.
+         * It is done just to avoid passing a null argument, but it would be correct as well.
+         */
+        var winner = result == MatchResult.Lose ? topPlayers.FirstOrDefault() : user;
 
         onGameOver?.Invoke(new GameOverArgs(gameResult.matchResult, winner));
         StartCoroutine(GameOverCoroutine());

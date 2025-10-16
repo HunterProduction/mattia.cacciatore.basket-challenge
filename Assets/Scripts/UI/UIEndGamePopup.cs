@@ -8,6 +8,12 @@ public class UIEndGamePopup : MonoBehaviour
 
     public void SetResultText(MatchResult matchResult)
     {
-        resultText.text = matchResult == MatchResult.Win ? " WIN!" : " LOSE";
+        resultText.text = matchResult switch
+        {
+            MatchResult.Win => "WIN!",
+            MatchResult.Lose => "LOSE",
+            MatchResult.Draw => "DRAW!",
+            _ => throw new System.ArgumentException()
+        };
     }
 }

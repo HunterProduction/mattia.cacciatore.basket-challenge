@@ -17,7 +17,13 @@ public class UIGameResultPanel : MonoBehaviour
             return;
         }
 
-        matchResultLabel.text = gameResultData.matchResult == MatchResult.Win ? "You Win!" : "You Lose";
+        matchResultLabel.text = gameResultData.matchResult switch
+        {
+            MatchResult.Win => "You Win!",
+            MatchResult.Lose => "You Lose",
+            MatchResult.Draw => "Draw!",
+            _ => throw new System.ArgumentException()
+        };
 
         var stats = gameResultData.GetAllPlayerStats(true);
 
