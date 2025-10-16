@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5ae598c8a9f9704e929640651d7eb23, type: 3}
   m_Name: GameConfigData_Default
   m_EditorClassIdentifier: 
-  perfectShotScore: 5
+  perfectShotScore: 3
   ringShotScore: 2
   backboardShotScore: 2
   gameDuration: 60

@@ -93,9 +93,33 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 5786324904875856384}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   onFireballBonusReset:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5786324904875856384}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!82 &3071751123240437050
 AudioSource:
   m_ObjectHideFlags: 0
@@ -316,6 +340,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 403cfe6df22f327499f517c65e0f1fef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &5786324904875856384 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6872581218896807334, guid: 7a6d9c8977ca43f459b8e57c9b58f7f9,
+    type: 3}
+  m_PrefabInstance: {fileID: 1093662102373177254}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &6444869007596592449 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6223325786099321575, guid: 7a6d9c8977ca43f459b8e57c9b58f7f9,
