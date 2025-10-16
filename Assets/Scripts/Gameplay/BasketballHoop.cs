@@ -74,6 +74,11 @@ public class BasketballHoop : MonoBehaviour
             return;
         }
 
+        // Verify that the ball is entering from above the hoop. Threshold is hardcoded for convenience, but could be exposed.
+        var ballVelocity = ballCollider.attachedRigidbody.velocity;
+        if (Mathf.Approximately(ballVelocity.sqrMagnitude, 0f) || Vector3.Dot(ballVelocity, Vector3.up) >= -0.3f)
+            return;
+
         var shotType = _ballShotRegister[ball];
         if (shotType == ShotType.Miss)
             shotType = ShotType.PerfectShot;
