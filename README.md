@@ -47,7 +47,7 @@ Below are a few contextual notes and design choices made during development:
 
 - Assets were intentionally kept simple with a fun prototype look, to focus on gameplay systems and architecture.
 
-- Some particle textures were manually created, and sound effects were edited (trimmed, equalized, normalized) to match the intended game feel.
+- Some particle textures and shaders were manually created, and sound effects were edited (trimmed, equalized, normalized) to match the intended game feel.
 
 - LINQ was occasionally used for initialization or readability, but never in performance-critical paths.
   
